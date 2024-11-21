@@ -1,4 +1,4 @@
-#!/Users/pallavikishore/Desktop/Projects/Churn-Prediction-with-ML/churn-prediction/venv/bin/python3
+#!/Users/pallavikishore/Desktop/Projects/Churn-Prediction-with-ML/churn-prediction/server/venv/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys
