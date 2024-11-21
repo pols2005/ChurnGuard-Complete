@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Heading from './Heading';
 import CustomerForm from './CustomerForm';
+import GaugeMeter from './GaugeMeter';
 
 const App = () => {
 
@@ -33,6 +34,7 @@ const App = () => {
       .then((data) => {
         if (!data.error) {
           setCustomerDetails(data.customer);
+          console.log("customer details", data.customer);
         }
       });
 
@@ -50,7 +52,6 @@ const App = () => {
       .then((data) => {
         if (!data.error) {
           setModelProbabilities(data.model_probabilities);
-          console.log("Model Probabilities:", data.model_probabilities);
         }
       });
   };
@@ -59,6 +60,9 @@ const App = () => {
     <div className="bg-gray-900 text-gray-100 min-h-screen flex flex-col items-center py-10">
       <Heading />
       <CustomerForm customers={customers} selectedCustomer={selectedCustomer} customerDetails={customerDetails} handleCustomerSelect={handleCustomerSelect}/>
+      <div className="max-w-4xl w-full mx-auto mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
+      {churnProbability && <GaugeMeter churnProbability={churnProbability}/>}
+      </div>
     </div>
   );
 };
