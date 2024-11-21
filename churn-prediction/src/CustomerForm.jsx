@@ -5,7 +5,7 @@ const CustomerForm = ({customers, selectedCustomer, customerDetails, handleCusto
 
   return (
     <form
-      className="p-8 rounded-lg max-w-4xl w-full mx-auto"
+      className="p-8 rounded-lg max-w-6xl w-full mx-auto"
       style={{
         background: `linear-gradient(135deg, #01497c, #014f86, #2a6f97, #2c7da0, #468faf)`,
       }}
