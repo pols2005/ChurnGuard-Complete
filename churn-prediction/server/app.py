@@ -16,11 +16,11 @@ models = {
     'XGBoost': load_model('xgb_model.pkl'),
     # 'DecisionTree': load_model('dt_model.pkl'),
     # 'RandomForest': load_model('rf_model.pkl'),
-    'GaussianNB': load_model('nb_model.pkl'),
+    # 'GaussianNB': load_model('nb_model.pkl'),
     'KNeighbors': load_model('knn_model.pkl'),
     # 'SVC': load_model('svm_model.pkl'),
-    'GradientBoosting': load_model('gb_model.pkl'),
-    'LogisticRegression': load_model('lr_model.pkl'),
+    'GBoosting': load_model('gb_model.pkl'),
+    # 'LogisticReg': load_model('lr_model.pkl'),
     'ExtraTrees': load_model('et_model.pkl'),
     'AdaBoost': load_model('ab_model.pkl')
 }
