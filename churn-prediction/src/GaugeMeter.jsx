@@ -6,9 +6,10 @@ const GaugeMeter = ({churnProbability}) => {
 let churnValue = Math.round(churnProbability * 100 * 100)/ 100;
 
 return(
-<div >
+<div>
   <div className="text-center font-semibold p-3">Churn Probability</div>
-  <div className="flex justify-center">
+  <div className="text-center font-semibold">The customer has a {churnValue}% probability of churning</div>
+  <div className="flex justify-center mt-9">
   <ReactSpeedometer
   value={churnValue}
   minValue={0}
@@ -19,6 +20,8 @@ return(
   needleTransitionDuration={4000}
   needleTransition="easeElastic"/>
 </div>
+
+
 </div>
 )
 };
