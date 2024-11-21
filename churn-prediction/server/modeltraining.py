@@ -569,6 +569,28 @@ weighted avg       0.85      0.85      0.85      2000
 ---------------------------
 Model saved as stacking_with_bagging2.pkl
 
+gb_model = GradientBoostingClassifier(
+    n_estimators=100,      # Number of trees
+    learning_rate=0.1,     # Step size for each tree
+    max_depth=3,           # Depth of each tree
+    random_state=42
+)
 
+evaluate_and_save_model(gb_model, X_resampled, X_test, y_resampled, y_test, 'gbClassifier.pkl')
+
+GradientBoostingClassifier Accuracy: 0.858000
+
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.90      0.93      0.91      1607
+           1       0.66      0.56      0.61       393
+
+    accuracy                           0.86      2000
+   macro avg       0.78      0.75      0.76      2000
+weighted avg       0.85      0.86      0.85      2000
+
+---------------------------
+Model saved as gbClassifier.pkl
 
 
