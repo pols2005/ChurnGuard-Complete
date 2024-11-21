@@ -21,7 +21,6 @@ const CustomerForm = ({customers, selectedCustomer, customerDetails, handleCusto
         />
       </div>
 
-      {selectedCustomer && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Column 1 */}
           <div>
@@ -101,7 +100,7 @@ const CustomerForm = ({customers, selectedCustomer, customerDetails, handleCusto
               <input
                 type="number"
                 className="w-full p-3 bg-white bg-opacity-20 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
-                value={customerDetails.Balance || ''}
+                value={customerDetails.Balance || (selectedCustomer ? 0 : '')}
                 readOnly
               />
             </div>
@@ -147,7 +146,6 @@ const CustomerForm = ({customers, selectedCustomer, customerDetails, handleCusto
             </div>
           </div>
         </div>
-      )}
     </form>
   );
 };
