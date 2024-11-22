@@ -3,6 +3,7 @@ import Heading from './Heading';
 import CustomerForm from './CustomerForm';
 import GaugeMeter from './GaugeMeter';
 import ModelProbabilities from './ModelProbabilities';
+import Explanation from './Explanation';
 
 const App = () => {
 
@@ -11,6 +12,7 @@ const App = () => {
   const [customerDetails, setCustomerDetails] = useState({});
   const [churnProbability, setChurnProbability] = useState(null);
   const [modelProbabilities, setModelProbabilities] = useState(null);
+  const [explanation, setExplanation] = useState('');
 
   useEffect(() => {
     fetch('http://localhost:5001/api/customers')
@@ -29,6 +31,7 @@ const App = () => {
 
     setChurnProbability(null);
     setModelProbabilities(null);
+    setExplanation('');
 
     fetch(`http://localhost:5001/api/customer/${selectedOption.value}`)
       .then((response) => response.json())
@@ -56,6 +59,15 @@ const App = () => {
           console.log("Models Probability:", data.model_probabilities);
         }
       });
+
+      fetch(`http://localhost:5001/api/llama/explanation/${selectedOption.value}`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (!data.error) {
+          setExplanation(data.explanation);
+          console.log("Explanation:", data.explanation);
+        }
+      });
   };
 
   return (
@@ -66,6 +78,7 @@ const App = () => {
       {churnProbability && <GaugeMeter churnProbability={churnProbability}/>}
       {modelProbabilities && <ModelProbabilities modelProbabilities={modelProbabilities}/>}
       </div>
+      {explanation && <Explanation explanation={explanation}/>}
     </div>
   );
 };
