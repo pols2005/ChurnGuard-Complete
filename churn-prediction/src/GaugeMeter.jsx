@@ -9,7 +9,7 @@ return(
 <div>
   <div className="text-center font-semibold p-3">Churn Probability</div>
   <div className="text-center font-semibold">The customer has a {churnValue}% probability of churning</div>
-  <div className="flex justify-center mt-9">
+  <div className="flex justify-center mt-9 items-center">
   <ReactSpeedometer
   value={churnValue}
   minValue={0}
@@ -17,7 +17,7 @@ return(
   endColor={"#FF0000"}
   startColor={"#33CC33"}
   needleColor="steelblue"
-  needleTransitionDuration={4000}
+  needleTransitionDuration={10000}
   needleTransition="easeElastic"/>
 </div>
 
