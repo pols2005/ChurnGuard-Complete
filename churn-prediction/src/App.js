@@ -3,6 +3,7 @@ import Heading from './Heading';
 import CustomerForm from './CustomerForm';
 import GaugeMeter from './GaugeMeter';
 import ModelProbabilities from './ModelProbabilities';
+import Percentile from './Percentile';
 import Explanation from './Explanation';
 
 const App = () => {
@@ -12,6 +13,7 @@ const App = () => {
   const [customerDetails, setCustomerDetails] = useState({});
   const [churnProbability, setChurnProbability] = useState(null);
   const [modelProbabilities, setModelProbabilities] = useState(null);
+  const [featurePercentile, setFeaturePercentile] = useState(null);
   const [explanation, setExplanation] = useState('');
 
   useEffect(() => {
@@ -31,7 +33,9 @@ const App = () => {
 
     setChurnProbability(null);
     setModelProbabilities(null);
+    setFeaturePercentile(null);
     setExplanation('');
+
 
     fetch(`http://localhost:5001/api/customer/${selectedOption.value}`)
       .then((response) => response.json())
@@ -60,6 +64,15 @@ const App = () => {
         }
       });
 
+      fetch(`http://localhost:5001/api/customer/${selectedOption.value}/feature-percentiles`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (!data.error) {
+          setFeaturePercentile(data.percentiles);
+          console.log("Percentiles:", data.percentiles);
+        }
+      });
+
       fetch(`http://localhost:5001/api/llama/explanation/${selectedOption.value}`)
       .then((response) => response.json())
       .then((data) => {
@@ -68,6 +81,7 @@ const App = () => {
           console.log("Explanation:", data.explanation);
         }
       });
+
   };
 
   return (
@@ -78,6 +92,7 @@ const App = () => {
       {churnProbability && <GaugeMeter churnProbability={churnProbability}/>}
       {modelProbabilities && <ModelProbabilities modelProbabilities={modelProbabilities}/>}
       </div>
+      {featurePercentile && <Percentile featurePercentile={featurePercentile}/>}
       {explanation && <Explanation explanation={explanation}/>}
     </div>
   );
