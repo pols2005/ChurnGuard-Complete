@@ -10,7 +10,7 @@ const colors = scaleOrdinal(schemeCategory10).range();
 
 let data = Object.keys(modelProbabilities).map((key) => {
   return {
-    name: key.slice(0,7),
+    name: key
     uv: Math.round(modelProbabilities[key] * 100 * 100)/100
   }
 });
@@ -36,7 +36,7 @@ const TriangleBar: FunctionComponent<any> = (props: any) => {
     <div>
     <div className="font-semibold text-center">Probability of churn predicted by various ML models (%)</div>
     <BarChart
-      width={525}
+      width={550}
       height={300}
       data={data}
       margin={{
