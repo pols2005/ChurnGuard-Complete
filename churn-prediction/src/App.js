@@ -5,6 +5,7 @@ import GaugeMeter from './GaugeMeter';
 import ModelProbabilities from './ModelProbabilities';
 import Percentile from './Percentile';
 import Explanation from './Explanation';
+import Email from './Email';
 
 const App = () => {
 
@@ -15,6 +16,7 @@ const App = () => {
   const [modelProbabilities, setModelProbabilities] = useState(null);
   const [featurePercentile, setFeaturePercentile] = useState(null);
   const [explanation, setExplanation] = useState('');
+  const [email, setEmail] = useState('');
 
   useEffect(() => {
     fetch('http://localhost:5001/api/customers')
@@ -35,14 +37,13 @@ const App = () => {
     setModelProbabilities(null);
     setFeaturePercentile(null);
     setExplanation('');
-
+    setEmail('');
 
     fetch(`http://localhost:5001/api/customer/${selectedOption.value}`)
       .then((response) => response.json())
       .then((data) => {
         if (!data.error) {
           setCustomerDetails(data.customer);
-          console.log("customer details", data.customer);
         }
       });
 
@@ -51,7 +52,6 @@ const App = () => {
       .then((data) => {
         if (!data.error) {
           setChurnProbability(data.average_probability);
-          console.log("Average Probability:", data.average_probability);
         }
       });
 
@@ -60,7 +60,6 @@ const App = () => {
       .then((data) => {
         if (!data.error) {
           setModelProbabilities(data.model_probabilities);
-          console.log("Models Probability:", data.model_probabilities);
         }
       });
 
@@ -69,16 +68,15 @@ const App = () => {
       .then((data) => {
         if (!data.error) {
           setFeaturePercentile(data.percentiles);
-          console.log("Percentiles:", data.percentiles);
         }
       });
 
-      fetch(`http://localhost:5001/api/llama/explanation/${selectedOption.value}`)
+      fetch(`http://localhost:5001/api/explanationwithemail/${selectedOption.value}`)
       .then((response) => response.json())
       .then((data) => {
         if (!data.error) {
           setExplanation(data.explanation);
-          console.log("Explanation:", data.explanation);
+          setEmail(data.email_content);
         }
       });
 
@@ -94,6 +92,7 @@ const App = () => {
       </div>
       {featurePercentile && <Percentile featurePercentile={featurePercentile}/>}
       {explanation && <Explanation explanation={explanation}/>}
+      {email && <Email email={email}/>}
     </div>
   );
 };
