@@ -10,8 +10,6 @@ const Percentile = ({ featurePercentile }) => {
     };
   });
 
-  console.log("Feature Percentile Data as an Array:", data);
-
   return (
     <div className="text-center">
       <h3 className="font-semibold pb-3">

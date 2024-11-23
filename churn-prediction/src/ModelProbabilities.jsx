@@ -15,8 +15,6 @@ let data = Object.keys(modelProbabilities).map((key) => {
   }
 });
 
-console.log("bar data", data);
-
 const getPath = (x: number, y: number, width: number, height: number) => {
   return `M${x},${y + height}C${x + width / 3},${y + height} ${x + width / 2},${
     y + height / 3
