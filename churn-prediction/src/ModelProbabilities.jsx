@@ -10,7 +10,7 @@ const colors = scaleOrdinal(schemeCategory10).range();
 
 let data = Object.keys(modelProbabilities).map((key) => {
   return {
-    name: key,
+    name: key.slice(0,7),
     uv: Math.round(modelProbabilities[key] * 100 * 100)/100
   }
 });
