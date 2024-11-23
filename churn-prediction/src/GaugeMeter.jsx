@@ -17,7 +17,7 @@ return(
   endColor={"#FF0000"}
   startColor={"#33CC33"}
   needleColor="steelblue"
-  needleTransitionDuration={10000}
+  needleTransitionDuration={8000}
   needleTransition="easeElastic"/>
 </div>
 
