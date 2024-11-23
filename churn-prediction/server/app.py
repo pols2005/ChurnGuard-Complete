@@ -6,6 +6,8 @@ import numpy as np
 from dotenv import load_dotenv
 import os
 from openai import OpenAI
+from scipy.stats import percentileofscore
+
 
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
@@ -234,6 +236,32 @@ def get_explanation(customer_id):
     })
 
 
+from scipy.stats import percentileofscore
+
+#endpoint to return feature percentiles
+@app.route('/api/customer/<int:customer_id>/feature-percentiles', methods=['GET'])
+def get_feature_percentiles(customer_id):
+    df = pd.read_csv('churn.csv')
+    customer = df[df['CustomerId'] == customer_id].to_dict(orient='records')
+
+    if not customer:
+        return jsonify({'error': 'Customer not found'}), 404
+
+    customer = customer[0]
+
+    features = ['NumOfProducts', 'Balance', 'EstimatedSalary', 'Tenure', 'CreditScore']
+
+    percentiles = {}
+    for feature in features:
+        try:
+            if feature in df.columns:
+                percentiles[feature] = percentileofscore(df[feature], customer[feature])
+            else:
+                percentiles[feature] = None
+        except Exception as e:
+            percentiles[feature] = f"Error: {str(e)}"
+    print("percentile", percentiles)
+    return jsonify({'customer_id': customer_id, 'percentiles': percentiles})
 
 
 
