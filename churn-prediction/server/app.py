@@ -79,18 +79,15 @@ def make_predictions(input_df):
 def explain_prediction(probability, input_dict, surname, churned_stats, non_churned_stats):
     if probability > 0.4:
         risk_type = "high"
+        explanation_context = f"{surname} is highly likely to churn. Explain why based on customer characteristics and feature importance."
     else:
         risk_type = "low"
+        explanation_context = f"{surname} is unlikely to churn. Highlight the positive characteristics and attributes that make churn less likely."
+
     prompt = f"""
-    You are a data scientist at a bank, where you specialize in interpreting and explaining predictions of machine learning models.
+    You are an expert data scientist at a bank, where you specialize in interpreting and explaining predictions of machine learning models.
 
-    If {surname} has over a 40% risk of churning, i.e. probability of {surname} to churn > 0.4, then generate a 10-sentence explanation and analysis of why {surname} is at risk of churning.
-
-    If {surname} has less than a 40% risk of churning, i.e. probability of {surname} to churn < 0.4, generate a 10-sentence explanation and analysis of why {surname} might not be at risk of churning.
-
-    Use the pronoun to refer to {surname} based on {surname}'s gender in the customer's information.
-
-    A machine learning model has predicted that a customer named {surname} has a {round(probability * 100, 1)}% probability of churning (risk_type ={risk_type}), based on the information provided below.
+    Your machine learning model has predicted that a customer named {surname} has a {round(probability * 100, 1)}% probability of churning, based on the information provided below.
 
     Here is the customer's information:
     {input_dict}
@@ -109,9 +106,9 @@ def explain_prediction(probability, input_dict, surname, churned_stats, non_chur
     Geography_Spain | 0.036855
     CreditScore | 0.035005
     EstimatedSalary | 0.032655
-    HasCrCard |	0.031940
-    Tenure |	0.030054
-    Gender_Male	| 0.000000
+    HasCrCard | 0.031940
+    Tenure | 0.030054
+    Gender_Male | 0.00000
 
     Here are summary statistics for churned customers:
     {churned_stats}
@@ -119,13 +116,14 @@ def explain_prediction(probability, input_dict, surname, churned_stats, non_chur
     Here are summary statistics for non-churned customers:
     {non_churned_stats}
 
-    Don't mention the machine learning model, or say anything like "Based on the machine learning model's prediction and top 10 most important features," just explain the prediction. Dont say anything like "based on the information provided or based on the prediction". Don't mention the percentage of churning explicitly - just use words like low or high risk based on risk_type given.
+    {explanation_context}
 
-    Do not invent probabilities or statistics that aren't in the input data.
+    Your explanation should be based on the customer's information, the summary statistics of churned and non-churned customers, and the feature importances provided.
 
-    Do not explicitly mention the 40% probability threshold in the explanation. Also explanation should be in a simple language, that even a non expert in the filed can understand.
+    Focus on the insights, avoiding explicit mention of probabilities or generic statements about machine learning. Keep the explanation concise and informative.
+
+    Don't mention the probability of churning or the machine learning model, or say anything like "Based on the machine learning model's prediction and top 10 most important features," just explain the prediction.
     """
-    print("EXPLANATION PROMPT", prompt)
     raw_response = client.chat.completions.create(
         model="gemma2-9b-it",
         messages=[
@@ -199,8 +197,8 @@ def get_model_probabilities(customer_id):
 
 
 #endpoint to get explanation for probability of churn for a particular customer based on id
-@app.route('/api/llama/explanation/<int:customer_id>', methods=['GET'])
-def get_explanation(customer_id):
+@app.route('/api/explanationwithemail/<int:customer_id>', methods=['GET'])
+def get_explanation_with_email(customer_id):
     df = pd.read_csv('churn.csv')
     customer = df[df['CustomerId'] == customer_id].to_dict(orient='records')
 
@@ -229,14 +227,38 @@ def get_explanation(customer_id):
         non_churned_stats
     )
 
+    email_prompt = f"""
+    You are a manager at Richie Bank. You are responsible for ensuring customers stay with the bank and are incentivized with various offers.
+
+    You noticed a customer named {customer['Surname']} has a {round(average_probability * 100, 1)}% probability of churning.
+
+    Here is the customer's information:
+    {customer}
+
+    Here is some explanation about the customer churning:
+    {explanation}
+
+    Generate an email to the customer based on their information, asking them to stay if they are at high risk of churning, or offering them incentives so that they become more loyal to the bank.
+
+    Make sure to list out a set of incentives to stay based on their information. Use numbered points (e.g., 1., 2., 3.) instead of bullet points and don't bold the numbered point heads.
+
+    Don't ever mention the probability of churning, or the machine learning model to the customer.
+    """
+
+    raw_response = client.chat.completions.create(
+        model="gemma2-9b-it",
+        messages=[
+            {"role": "user", "content": email_prompt}
+        ]
+    )
+
+    email_content = raw_response.choices[0].message.content
     return jsonify({
         'customer_id': customer_id,
         'average_probability': average_probability,
-        'explanation': explanation
+        'explanation': explanation,
+        'email_content': email_content
     })
-
-
-from scipy.stats import percentileofscore
 
 #endpoint to return feature percentiles
 @app.route('/api/customer/<int:customer_id>/feature-percentiles', methods=['GET'])
@@ -260,7 +282,6 @@ def get_feature_percentiles(customer_id):
                 percentiles[feature] = None
         except Exception as e:
             percentiles[feature] = f"Error: {str(e)}"
-    print("percentile", percentiles)
     return jsonify({'customer_id': customer_id, 'percentiles': percentiles})
 
 
