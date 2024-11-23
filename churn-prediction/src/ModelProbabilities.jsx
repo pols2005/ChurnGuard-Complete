@@ -36,7 +36,7 @@ const TriangleBar: FunctionComponent<any> = (props: any) => {
     <div>
     <div className="font-semibold text-center">Probability of churn predicted by various ML models (%)</div>
     <BarChart
-      width={550}
+      width={500}
       height={300}
       data={data}
       margin={{
