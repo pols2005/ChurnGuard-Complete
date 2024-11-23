@@ -19,7 +19,8 @@ const App = () => {
   const [email, setEmail] = useState('');
 
   useEffect(() => {
-    fetch('http://localhost:5001/api/customers')
+    // fetch('http://localhost:5001/api/customers')
+    fetch('https://churnguard-fb9w.onrender.com/api/customers')
       .then((response) => response.json())
       .then((data) => {
         const formattedCustomers = data.map((customer) => ({
@@ -39,7 +40,8 @@ const App = () => {
     setExplanation('');
     setEmail('');
 
-    fetch(`http://localhost:5001/api/customer/${selectedOption.value}`)
+    // fetch(`http://localhost:5001/api/customer/${selectedOption.value}`)
+    fetch(`https://churnguard-fb9w.onrender.com/api/customer/${selectedOption.value}`)
       .then((response) => response.json())
       .then((data) => {
         if (!data.error) {
@@ -47,7 +49,8 @@ const App = () => {
         }
       });
 
-    fetch(`http://localhost:5001/api/customer/${selectedOption.value}/churn-probability`)
+    // fetch(`http://localhost:5001/api/customer/${selectedOption.value}/churn-probability`)
+    fetch(`https://churnguard-fb9w.onrender.com/api/customer/${selectedOption.value}/churn-probability`)
       .then((response) => response.json())
       .then((data) => {
         if (!data.error) {
@@ -55,7 +58,8 @@ const App = () => {
         }
       });
 
-    fetch(`http://localhost:5001/api/customer/${selectedOption.value}/churn-model-probabilities`)
+    // fetch(`http://localhost:5001/api/customer/${selectedOption.value}/churn-model-probabilities`)
+    fetch(`https://churnguard-fb9w.onrender.com/api/customer/${selectedOption.value}/churn-model-probabilities`)
       .then((response) => response.json())
       .then((data) => {
         if (!data.error) {
@@ -63,7 +67,8 @@ const App = () => {
         }
       });
 
-      fetch(`http://localhost:5001/api/customer/${selectedOption.value}/feature-percentiles`)
+      // fetch(`http://localhost:5001/api/customer/${selectedOption.value}/feature-percentiles`)
+      fetch(`https://churnguard-fb9w.onrender.com/api/customer/${selectedOption.value}/feature-percentiles`)
       .then((response) => response.json())
       .then((data) => {
         if (!data.error) {
@@ -71,7 +76,8 @@ const App = () => {
         }
       });
 
-      fetch(`http://localhost:5001/api/explanationwithemail/${selectedOption.value}`)
+      // fetch(`http://localhost:5001/api/explanationwithemail/${selectedOption.value}`)
+      fetch(`https://churnguard-fb9w.onrender.com/api/explanationwithemail/${selectedOption.value}`)
       .then((response) => response.json())
       .then((data) => {
         if (!data.error) {
