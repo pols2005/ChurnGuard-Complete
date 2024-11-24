@@ -37,7 +37,7 @@ ChurnGuard is a web application designed to predict customer churn and provide a
 ![Static Badge](https://img.shields.io/badge/seaborn-yellow?style=for-the-badge)
 ![Static Badge](https://img.shields.io/badge/groq-yellow?style=for-the-badge)
 ![Static Badge](https://img.shields.io/badge/google%20colab-yellow?style=for-the-badge)
-![Static Badge](https://img.shields.io/badge/gemma2-yellow?style=for-the-badge)
+![Static Badge](https://img.shields.io/badge/gemma29Bit-yellow?style=for-the-badge)
 ![Static Badge](https://img.shields.io/badge/scikit%20learn-yellow?style=for-the-badge)
 
 ### Deployment
