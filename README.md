@@ -112,24 +112,24 @@ ChurnGuard is a web application designed to predict customer churn and provide a
 ### Installation
 1. Clone the repo
 ```sh
-  git clone https://github.com/Pallavi25Kishore/ChurnGuard.git
+git clone https://github.com/Pallavi25Kishore/ChurnGuard.git
 ```
 
 2. Navigate to churn-prediction folder and install NPM packages
 ```sh
-  cd churn-prediction
-  npm install
+cd churn-prediction
+npm install
 ```
 
 3. Navigate to src/App.js and change all fetch urls to http://localhost:5001 instead of public url for deployed backend on render 
 ```sh
-  //fetch('https://churnguard-fb9w.onrender.com/..........')
-  fetch('http://localhost:5001/..........')
+//fetch('https://churnguard-fb9w.onrender.com/..........')
+fetch('http://localhost:5001/..........')
 ```
 
 4. Run in dev environment
 ```sh
-  npm start
+npm start
 ```
 
 5. Navigate to server folder and activate virtual environment
