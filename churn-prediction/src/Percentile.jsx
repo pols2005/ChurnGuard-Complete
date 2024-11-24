@@ -15,7 +15,7 @@ const Percentile = ({ featurePercentile }) => {
       <h3 className="font-semibold pb-3">
         Customer Feature Percentiles
       </h3>
-    <BarChart width={850} height={250} data={data}>
+    <BarChart width={850} height={300} data={data}>
       <XAxis dataKey="name" orientation="top"/>
       <YAxis />
       <Tooltip
@@ -23,7 +23,7 @@ const Percentile = ({ featurePercentile }) => {
       itemStyle={{ color: "black" }} // Tooltip text color
       />
       <Legend />
-      <Bar dataKey="percentile" fill="#ffff00" />
+      <Bar dataKey="percentile" fill="#ffff00" barSize='15%'/>
     </BarChart>
 
 
