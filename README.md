@@ -6,9 +6,8 @@
 ChurnGuard is a web application designed to predict customer churn and provide actionable insights to retain at-risk customers. By leveraging advanced machine learning and generative AI, ChurnGuard empowers businesses to reduce churn and strengthen customer relationships.
 
 <div align="center">
-  <video width="600" controls>
-    <source src="/churn-prediction/public/trimmed video.mov" type="video/mp4">
-  </video>
+  <h3>ChurnGuard Dashboard</h3>h3>
+  <img src="churn-prediction/public/finalgif.gif" alt="ChurnGuarddashboard gif" width="600px" />
 </div>
 
 ## :video_camera:Demo
