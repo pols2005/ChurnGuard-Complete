@@ -110,30 +110,58 @@ ChurnGuard is a web application designed to predict customer churn and provide a
 ![Static Badge](https://img.shields.io/badge/Flask-black)
 
 ### Installation
-1. Clone the repo.
+1. Clone the repo
 ```sh
-  git clone https://github.com/Pallavi25Kishore/Rhythm.git
+  git clone https://github.com/Pallavi25Kishore/ChurnGuard.git
 ```
 
-2. Install NPM packages.
+2. Navigate to churn-prediction folder and install NPM packages
 ```sh
+  cd churn-prediction
   npm install
 ```
 
-3. Make a copy of the .exampleenv file and rename it to .env. Enter the following in the .env file.
+3. Navigate to src/App.js and change all fetch urls to http://localhost:5001 instead of public url for deployed backend on render 
 ```sh
-PORT = PORT
-DB_HOST = "host name"
-DB_USER = "username"
-DB_NAME = "name of database"
-DB_PASSWORD = "password"
-DB_PORT = DB PORT
+  //fetch('https://churnguard-fb9w.onrender.com/..........')
+  fetch('http://localhost:5001/..........')
 ```
 
-4. Run in dev environment.
+4. Run in dev environment
 ```sh
-  npm run server-dev
-  npm run react-dev
+  npm start
 ```
+
+5. Navigate to server folder and activate virtual environment
+```sh
+source venv/bin/activate
+```
+
+6. Install dependencies
+```sh
+pip install -r requirements.txt
+```
+
+7. Make a copy of the server/.exampleenv file and rename it to .env. Enter the following in the .env file
+```sh
+GROQ_API_KEY=<groqapikey>
+```
+
+8. Navigate to server/app.py. Comment out and uncomment out the code such that the final code looks as follows:
+```sh
+#for running on local
+if __name__ == '__main__':
+    app.run(debug=True, port=5001)
+
+#for deplyment on Render
+#if __name__ == '__main__':
+    #app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
+```
+
+9. Start the flask server
+```sh
+python3 app.py
+```
+
 
 
