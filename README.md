@@ -6,7 +6,7 @@ ChurnGuard is a web application designed to predict customer churn and provide a
 
 <div align="center">
    <h3>ChurnGuard Dashboard</h3>
-   <img src="churn-prediction/public/finalgif.gif" alt="ChurnGuard Dashboard gif" width="750px"/>
+   <img src="churn-prediction/public/finalgif.gif" alt="ChurnGuard Dashboard gif"/>
 </div>
 
 <table align="center">
