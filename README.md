@@ -18,27 +18,83 @@ ChurnGuard is a web application designed to predict customer churn and provide a
 
 ## :rocket:Technologies
 ### Front-End
-![Static Badge](https://img.shields.io/badge/React-black?style=for-the-badge)
-
+![Static Badge](https://img.shields.io/badge/javascript-yellow?style=for-the-badge)
+![Static Badge](https://img.shields.io/badge/React-yellow?style=for-the-badge)
+![Static Badge](https://img.shields.io/badge/HTML%2FCSS-yellow?style=for-the-badge)
+![Static Badge](https://img.shields.io/badge/Tailwind-yellow?style=for-the-badge)
+![Static Badge](https://img.shields.io/badge/Recharts-yellow?style=for-the-badge)
+![Static Badge](https://img.shields.io/badge/reactd3speedometer-yellow?style=for-the-badge)
 
 ### Back-End 
+![Static Badge](https://img.shields.io/badge/python-yellow?style=for-the-badge)
+![Static Badge](https://img.shields.io/badge/flask-yellow?style=for-the-badge)
 
+### Other Tools/ Machine Learning + Generative AI 
+![Static Badge](https://img.shields.io/badge/kaggle-yellow?style=for-the-badge)
+![Static Badge](https://img.shields.io/badge/pandas-yellow?style=for-the-badge)
+![Static Badge](https://img.shields.io/badge/numpy-yellow?style=for-the-badge)
+![Static Badge](https://img.shields.io/badge/scipy-yellow?style=for-the-badge)
+![Static Badge](https://img.shields.io/badge/seaborn-yellow?style=for-the-badge)
+![Static Badge](https://img.shields.io/badge/groq-yellow?style=for-the-badge)
+![Static Badge](https://img.shields.io/badge/google%20colab-yellow?style=for-the-badge)
+![Static Badge](https://img.shields.io/badge/gemma2-yellow?style=for-the-badge)
+![Static Badge](https://img.shields.io/badge/scikit%20learn-yellow?style=for-the-badge)
 
-### Machine Learning + Generative AI 
+### Deployment
+![Static Badge](https://img.shields.io/badge/vercel-yellow?style=for-the-badge)
+![Static Badge](https://img.shields.io/badge/render-yellow?style=for-the-badge)
 
+## :gear: Features
 
+- [X] **Customer Churn Prediction**: Predict churn probabilities using ML models.
+- [X] **Actionable Insights**: Detailed explanations of why a customer is at risk of churning, powered by Google’s Gemma2.
+- [X]  **Personalized Retention Strategies**: Automatically generate customer-specific emails to incentivize loyalty.
+- [X]  **Dynamic Dashboards**: Interactive visualizations including:
+        - **Speedometer**: Displays average churn probability.
+        - **Model Predictions**: Bar chart of churn probabilities from individual ML models.
+        -**Customer Ranking**: Bar chart showing percentile rank among peers.
 
+## :rocket: Machine Learning Workflow
 
-## :star2:Roadmap
- - [X] Set up the React framework.
- - [X] Implement MongoDB database schemas and establish connections.
- - [X] Create landing page to engage users and introduce app features.
- - [X] Develop artist discovery and top tracks listing features.
- - [X] Enable playlist management with track selection and deselection.
- - [X] Enable playlist creation and deletion features.
- - [X] Integrate artist search functionality by name.
- - [X] Add visual music bar animation during playback.
- - [X] Optimize app for performance with Lighthouse achieving FCP of 1.3s and TBT of 0ms.
+1. **Dataset**:  
+   - Bank customer dataset from Kaggle.
+
+2. **Data Splitting**:  
+   - The dataset was split into 80/20 ratio (80% for training and 20% for testing)
+
+3. **Feature Engineering**:  
+   - Performed feature selection, transformation, and creation to enhance the dataset.  
+   - Addressed class imbalance using SMOTE to oversample the minority class.
+
+4. **Models Trained**:  
+   - XGBoost  
+   - k-Nearest Neighbors  
+   - Gradient Boosting  
+   - ExtraTrees  
+   - AdaBoost  
+
+5. **Ensembling Techniques**:  
+   - Implemented **voting classifiers**, **stacking**, and **bagging** to combine the strengths of multiple models and improve predictive performance.  
+
+6. **Performance Metrics**:  
+   - **Accuracy**: 0.851500  
+   - **Recall**: 0.62
+   - In the context of ChurnGuard, recall is a critical metric because it measures the model's ability to correctly identify customers who are at risk of churning and the cost of false negatives is much higher than the cost of false positives.
+   - 
+## :computer: Application Architecture
+
+### Frontend:
+- Built with **React** for an intuitive and dynamic user experience.
+- Deployed on **Vercel** for scalability and reliability.
+
+### Backend:
+- Powered by **Flask**, which handles API services and integrates with AI tools.
+- Deployed on **Render** for seamless performance.
+
+### Integration with Generative AI:
+- Google’s **Gemma2** generates:
+  - Explanations for churn predictions.
+  - Personalized emails to incentivize at-risk customers.
 
 ## :sparkles:Getting Started
 ### Prerequisites
