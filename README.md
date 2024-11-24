@@ -46,13 +46,20 @@ ChurnGuard is a web application designed to predict customer churn and provide a
 
 ## :gear: Features
 
-- [X] **Customer Churn Prediction**: Predict churn probabilities using ML models.
-- [X] **Actionable Insights**: Detailed explanations of why a customer is at risk of churning, powered by Google’s Gemma2.
-- [X]  **Personalized Retention Strategies**: Automatically generate customer-specific emails to incentivize loyalty.
-- [X]  **Dynamic Dashboards**: Interactive visualizations including:
-        - **Speedometer**: Displays average churn probability.
-        - **Model Predictions**: Bar chart of churn probabilities from individual ML models.
-        -**Customer Ranking**: Bar chart showing percentile rank among peers.
+- [X] [**Customer Churn Prediction**:](https://img.shields.io/badge/Customer%20Churn%20Prediction-purple
+) Predict churn probabilities using ML models.
+- [X] [**Actionable Insights**:](https://img.shields.io/badge/Actionable%20Insights-purple
+) Detailed explanations of why a customer is at risk of churning, powered by Google’s Gemma2.
+- [X]  [**Personalized Retention Strategies**:](https://img.shields.io/badge/Personalized%20Retention%20Strategies-purple
+) Automatically generate customer-specific emails to incentivize loyalty.
+- [X]  [**Dynamic Dashboards**](https://img.shields.io/badge/Dynamic%20Dashboards-purple
+): Interactive visualizations including:
+        - [**Speedometer**:](https://img.shields.io/badge/Speedometer-violet
+) Displays average churn probability.
+        - [**Model Predictions**:](https://img.shields.io/badge/Model%20Predictions-violet
+) Bar chart of churn probabilities from individual ML models.
+        -[**Customer Ranking**:](https://img.shields.io/badge/Customer%20Ranking-violet
+) Bar chart showing percentile rank among peers.
 
 ## :rocket: Machine Learning Workflow
 
@@ -80,7 +87,7 @@ ChurnGuard is a web application designed to predict customer churn and provide a
    - **Accuracy**: 0.851500  
    - **Recall**: 0.62
    - In the context of ChurnGuard, recall is a critical metric because it measures the model's ability to correctly identify customers who are at risk of churning and the cost of false negatives is much higher than the cost of false positives.
-   - 
+     
 ## :computer: Application Architecture
 
 ### Frontend:
