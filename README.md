@@ -8,7 +8,7 @@ ChurnGuard is a web application designed to predict customer churn and provide a
 ## :video_camera:Demo
 <div align="center">
   <a href="https://youtu.be/NQAymmtNgfo">
-    <img src="https://youtu.be/NQAymmtNgfo" alt="Watch the demo video" width="800px"/>
+    <img src="src="https://img.youtube.com/vi/NQAymmtNgfo/0.jpg"" alt="Watch the demo video" width="800px"/>
   </a>
 </div>
 
