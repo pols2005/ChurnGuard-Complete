@@ -53,9 +53,12 @@ ChurnGuard is a web application designed to predict customer churn and provide a
 ![Static Badge](https://img.shields.io/badge/Personalized%20Retention%20Strategies-purple) Automatically generate customer-specific emails to incentivize loyalty
 
 ![Static Badge](https://img.shields.io/badge/Dynamic%20Dashboards-purple) Interactive visualizations including:
-  - ![Static Badge](https://img.shields.io/badge/Speedometer-purple) Displays average churn probability
-  - ![Static Badge](https://img.shields.io/badge/Model%20Predictions-purple) Bar chart of churn probabilities from individual ML models
-  - ![Static Badge](https://img.shields.io/badge/Customer%20Ranking-purple) Bar chart showing percentile rank among peers
+
+![Static Badge](https://img.shields.io/badge/Speedometer-purple) Displays average churn probability
+
+![Static Badge](https://img.shields.io/badge/Model%20Predictions-purple) Bar chart of churn probabilities from individual ML models
+
+![Static Badge](https://img.shields.io/badge/Customer%20Ranking-purple) Bar chart showing percentile rank among peers
 
 ## :rocket: Machine Learning Workflow
 
@@ -101,8 +104,10 @@ ChurnGuard is a web application designed to predict customer churn and provide a
 
 ## :sparkles:Getting Started
 ### Prerequisites
-![NPM](https://img.shields.io/badge/NPM-%23000000.svg?style=for-the-badge&logo=npm&logoColor=white)
-
+![Static Badge](https://img.shields.io/badge/npm-black)
+![Static Badge](https://img.shields.io/badge/Python%203.8%2B-black)
+![Static Badge](https://img.shields.io/badge/pip-black)
+![Static Badge](https://img.shields.io/badge/Flask-black)
 
 ### Installation
 1. Clone the repo.
