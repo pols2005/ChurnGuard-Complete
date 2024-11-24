@@ -12,13 +12,13 @@ ChurnGuard is a web application designed to predict customer churn and provide a
 <table align="center">
   <tr>
     <td align="center">
-      <img src="churn-prediction/public/1.png" alt="Image 1" width="250px" />
+      <img src="churn-prediction/public/1.png" alt="Image 1" width="200px" />
     </td>
     <td align="center">
-      <img src="churn-prediction/public/2.png" alt="Image 2" width="250px" />
+      <img src="churn-prediction/public/2.png" alt="Image 2" width="200px" />
     </td>
     <td align="center">
-      <img src="churn-prediction/public/3.png" alt="Image 3" width="250px" />
+      <img src="churn-prediction/public/3.png" alt="Image 3" width="200px" />
     </td>
   </tr>
 </table>
