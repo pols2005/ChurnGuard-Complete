@@ -4,24 +4,30 @@
 ## :books:About
 ChurnGuard is a web application designed to predict customer churn and provide actionable insights to retain at-risk customers. By leveraging advanced machine learning and generative AI, ChurnGuard empowers businesses to reduce churn and strengthen customer relationships.
 
-<div align="center">
-   <h3>ChurnGuard Dashboard</h3>
-   <img src="churn-prediction/public/finalgif.gif" alt="ChurnGuard Dashboard gif"/>
-</div>
-
 <table align="center">
+
   <tr>
-    <td align="center">
-      <img src="churn-prediction/public/1.png" alt="Image 1" width="250px" />
-    </td>
-    <td align="center">
-      <img src="churn-prediction/public/2.png" alt="Image 2" width="250px" />
-    </td>
-    <td align="center">
-      <img src="churn-prediction/public/3.png" alt="Image 3" width="250px" />
+    <td colspan="3" align="center">
+      <h3>ChurnGuard Dashboard</h3>
+      <img src="churn-prediction/public/finalgif.gif" alt="ChurnGuard Dashboard gif" width="600px" />
     </td>
   </tr>
+ 
+  <tr>
+    <td align="center">
+      <img src="churn-prediction/public/1.png" alt="Image 1" width="200px" />
+    </td>
+    <td align="center">
+      <img src="churn-prediction/public/2.png" alt="Image 2" width="200px" />
+    </td>
+    <td align="center">
+      <img src="churn-prediction/public/3.png" alt="Image 3" width="200px" />
+    </td>
+  </tr>
+
+
 </table>
+
 
 
 ## :video_camera:Deployed App Demo on youtube
