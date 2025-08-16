@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { OrganizationProvider } from './contexts/OrganizationContext';
+import { SubscriptionProvider } from './contexts/SubscriptionContext';
 import Heading from './Heading';
 import CustomerForm from './CustomerForm';
 import GaugeMeter from './GaugeMeter';
@@ -6,6 +9,11 @@ import ModelProbabilities from './ModelProbabilities';
 import Percentile from './Percentile';
 import Explanation from './Explanation';
 import Email from './Email';
+import ThemeToggle from './components/ThemeToggle';
+import SettingsButton from './components/SettingsButton';
+import PremiumAnalytics from './components/PremiumAnalytics';
+import CustomizableLayout from './components/CustomizableLayout';
+import PerformanceMonitor from './components/PerformanceMonitor';
 
 const App = () => {
 
@@ -89,17 +97,60 @@ const App = () => {
   };
 
   return (
-    <div className="bg-gray-900 text-gray-100 min-h-screen flex flex-col items-center py-10">
-      <Heading />
-      <CustomerForm customers={customers} selectedCustomer={selectedCustomer} customerDetails={customerDetails} handleCustomerSelect={handleCustomerSelect}/>
-      <div className="max-w-6xl w-full mx-auto mt-10 grid grid-cols-1 md:grid-cols-2 gap-0">
-      {churnProbability && <GaugeMeter churnProbability={churnProbability}/>}
-      {modelProbabilities && <ModelProbabilities modelProbabilities={modelProbabilities}/>}
-      </div>
-      {featurePercentile && <Percentile featurePercentile={featurePercentile}/>}
-      {explanation && <Explanation explanation={explanation}/>}
-      {email && <Email email={email}/>}
-    </div>
+    <SubscriptionProvider>
+      <OrganizationProvider>
+        <ThemeProvider>
+          <div className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-200">
+            {/* Control Panel in top-right corner */}
+            <div className="fixed top-4 right-4 z-50 flex space-x-2">
+              <SettingsButton />
+              <ThemeToggle />
+            </div>
+        
+        {/* Main Content */}
+        <div className="flex flex-col items-center py-10 px-4">
+          <Heading />
+          
+          <div className="max-w-6xl w-full mx-auto mt-8">
+            <CustomizableLayout>
+              <CustomerForm 
+                customers={customers} 
+                selectedCustomer={selectedCustomer} 
+                customerDetails={customerDetails} 
+                handleCustomerSelect={handleCustomerSelect}
+              />
+              
+              {churnProbability && (
+                <GaugeMeter churnProbability={churnProbability}/>
+              )}
+              
+              {modelProbabilities && (
+                <ModelProbabilities modelProbabilities={modelProbabilities}/>
+              )}
+              
+              {featurePercentile && (
+                <Percentile featurePercentile={featurePercentile}/>
+              )}
+              
+              <PremiumAnalytics />
+              
+              {explanation && (
+                <Explanation explanation={explanation}/>
+              )}
+              
+              {email && (
+                <Email email={email}/>
+              )}
+            </CustomizableLayout>
+          </div>
+        </div>
+        
+        {/* Performance Monitor */}
+        <PerformanceMonitor />
+          </div>
+        </ThemeProvider>
+      </OrganizationProvider>
+    </SubscriptionProvider>
   );
 };
 

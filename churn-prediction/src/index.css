@@ -15,3 +15,41 @@ code {
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    /* Brand Colors - Light Mode */
+    --brand-primary: #DAA520;
+    --brand-primary-dark: #F4D03F;
+    --brand-secondary: #B8860B;
+    --brand-secondary-dark: #F7DC6F;
+    
+    /* Background Colors */
+    --background: #FFFFFF;
+    --background-light: #FFFFFF;
+    --background-dark: #0F0F0F;
+    
+    /* Surface Colors */
+    --surface: #F8F9FA;
+    --surface-light: #F8F9FA;
+    --surface-dark: #1A1A1A;
+    
+    /* Organization Customization Variables (for white-labeling) */
+    --org-primary: var(--brand-primary);
+    --org-secondary: var(--brand-secondary);
+    --org-logo-url: '';
+    --org-name: 'ChurnGuard';
+  }
+  
+  .dark {
+    --background: var(--background-dark);
+    --surface: var(--surface-dark);
+    --brand-primary: var(--brand-primary-dark);
+    --brand-secondary: var(--brand-secondary-dark);
+  }
+  
+  /* Ensure smooth theme transitions */
+  * {
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+}
