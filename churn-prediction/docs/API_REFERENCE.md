@@ -1,598 +1,525 @@
-# ChurnGuard UI Enhancement API Reference
+# ChurnGuard API Reference
 
-## Context Providers
+## 🌐 Overview
 
-### ThemeProvider
+The ChurnGuard API provides comprehensive access to advanced analytics, customer intelligence, A/B testing, and white-label theming features. All APIs follow REST principles with JSON request/response formats.
 
-Provides theme management functionality throughout the application.
+## 🔑 Authentication
 
-```jsx
-import { ThemeProvider, useTheme } from './contexts/ThemeContext';
+All API requests require authentication using API keys:
+
+```http
+Authorization: Bearer YOUR_API_KEY
+X-Organization-ID: your-org-id
+Content-Type: application/json
 ```
 
-#### Props
-- `children`: React.ReactNode - Child components
+## 📊 Analytics APIs
 
-#### Hook: useTheme()
+### Real-Time Metrics
 
-Returns theme management functions and state.
+#### Track Event
+Record customer events for real-time analysis.
 
-**Return Object:**
-```typescript
+```http
+POST /api/v1/analytics/events
+```
+
+**Request Body:**
+```json
 {
-  theme: 'light' | 'dark' | 'system';
-  setTheme: (theme: string) => void;
-  resolvedTheme: 'light' | 'dark';
-}
-```
-
-**Example:**
-```jsx
-function MyComponent() {
-  const { theme, setTheme, resolvedTheme } = useTheme();
-  
-  return (
-    <div className={`theme-${resolvedTheme}`}>
-      Current theme: {theme}
-      <button onClick={() => setTheme('dark')}>
-        Switch to Dark
-      </button>
-    </div>
-  );
-}
-```
-
----
-
-### OrganizationProvider
-
-Manages organization branding and white-labeling settings.
-
-```jsx
-import { OrganizationProvider, useOrganization } from './contexts/OrganizationContext';
-```
-
-#### Hook: useOrganization()
-
-**Return Object:**
-```typescript
-{
-  organization: {
-    name: string;
-    logoUrl: string;
-    primaryColor: string;
-    secondaryColor: string;
-    customCss: string;
-    tier: 'starter' | 'professional' | 'enterprise';
-  };
-  updateOrganization: (updates: Partial<Organization>) => void;
-  resetToDefault: () => void;
-}
-```
-
-**Example:**
-```jsx
-function BrandedHeader() {
-  const { organization, updateOrganization } = useOrganization();
-  
-  const handleColorChange = (color) => {
-    updateOrganization({ primaryColor: color });
-  };
-  
-  return (
-    <header style={{ 
-      backgroundColor: organization.primaryColor,
-      color: 'white'
-    }}>
-      {organization.logoUrl && (
-        <img src={organization.logoUrl} alt="Logo" className="h-8" />
-      )}
-      <h1>{organization.name}</h1>
-    </header>
-  );
-}
-```
-
----
-
-### SubscriptionProvider
-
-Handles subscription tiers and feature access control.
-
-```jsx
-import { SubscriptionProvider, useSubscription, SUBSCRIPTION_TIERS } from './contexts/SubscriptionContext';
-```
-
-#### Hook: useSubscription()
-
-**Return Object:**
-```typescript
-{
-  currentTier: 'starter' | 'professional' | 'enterprise';
-  usage: {
-    users: number;
-    dataExports: number;
-    apiCalls: number;
-  };
-  hasFeature: (feature: string) => boolean;
-  canUse: (feature: string, count?: number) => boolean;
-  incrementUsage: (feature: string, amount?: number) => void;
-  upgradeTo: (tier: string) => void;
-  getCurrentTierInfo: () => TierInfo;
-  getUpgradeOptions: () => TierInfo[];
-  SUBSCRIPTION_TIERS: object;
-}
-```
-
-**Example:**
-```jsx
-function PremiumButton() {
-  const { hasFeature, upgradeTo, currentTier } = useSubscription();
-  
-  if (!hasFeature('advancedAnalytics')) {
-    return (
-      <button onClick={() => upgradeTo('professional')}>
-        Upgrade to Professional for Advanced Analytics
-      </button>
-    );
+  "customer_id": "user123",
+  "event_type": "page_view",
+  "timestamp": "2024-01-15T10:30:00Z",
+  "properties": {
+    "page": "/dashboard",
+    "duration": 45,
+    "source": "organic"
   }
-  
-  return <AdvancedAnalyticsButton />;
 }
 ```
 
----
-
-## Components
-
-### FeatureGate
-
-Controls access to premium features based on subscription tier.
-
-```jsx
-import FeatureGate from './components/FeatureGate';
-```
-
-#### Props
-```typescript
+**Response:**
+```json
 {
-  feature: string;                    // Feature key from SUBSCRIPTION_TIERS
-  children: React.ReactNode;          // Premium content
-  fallback?: React.ReactNode;         // Content for non-premium users
-  showUpgradePrompt?: boolean;        // Show upgrade UI (default: true)
-  requiredTier?: string;              // Override required tier message
+  "event_id": "evt_12345",
+  "status": "processed",
+  "timestamp": "2024-01-15T10:30:00Z"
 }
 ```
 
-**Example:**
-```jsx
-function CustomColorPicker() {
-  return (
-    <FeatureGate 
-      feature="customColors" 
-      requiredTier="professional"
-      fallback={<BasicColorPicker />}
-    >
-      <AdvancedColorPicker />
-    </FeatureGate>
-  );
-}
+#### Query Metrics
+Retrieve aggregated metrics data.
+
+```http
+GET /api/v1/analytics/metrics/{metric_name}
 ```
 
----
+**Query Parameters:**
+- `start_time` (ISO 8601): Start of time range
+- `end_time` (ISO 8601): End of time range
+- `aggregation` (string): hour, day, week, month
+- `filters` (object): Additional filtering criteria
 
-### ThemeToggle
-
-Button component for switching between theme modes.
-
-```jsx
-import ThemeToggle from './components/ThemeToggle';
-```
-
-#### Props
-- No required props - uses theme context internally
-
-**Features:**
-- Cycles through: Light → Dark → System
-- Shows current theme icon
-- Displays theme label on larger screens
-- Tooltip with current theme info
-
-**Example:**
-```jsx
-function AppHeader() {
-  return (
-    <header className="flex justify-between">
-      <Logo />
-      <ThemeToggle />
-    </header>
-  );
-}
-```
-
----
-
-### OrganizationSettings
-
-Modal component for configuring organization branding.
-
-```jsx
-import OrganizationSettings from './components/OrganizationSettings';
-```
-
-#### Props
-```typescript
+**Response:**
+```json
 {
-  isOpen: boolean;
-  onClose: () => void;
+  "metric_name": "conversion_rate",
+  "time_series": [
+    {
+      "timestamp": "2024-01-15T00:00:00Z",
+      "value": 0.045,
+      "count": 1250
+    }
+  ],
+  "summary": {
+    "average": 0.043,
+    "total": 0.045,
+    "trend": "increasing"
+  }
 }
 ```
 
-**Features:**
-- Organization name editing
-- Logo upload (Professional+)
-- Color customization (Professional+)
-- Custom CSS injection (Enterprise)
-- Real-time preview
-- Usage dashboard integration
+### Customer Intelligence
 
-**Example:**
-```jsx
-function SettingsModal() {
-  const [isOpen, setIsOpen] = useState(false);
-  
-  return (
-    <>
-      <button onClick={() => setIsOpen(true)}>
-        Settings
-      </button>
-      <OrganizationSettings 
-        isOpen={isOpen} 
-        onClose={() => setIsOpen(false)} 
-      />
-    </>
-  );
-}
+#### Customer Journey Analysis
+Analyze individual customer journeys.
+
+```http
+GET /api/v1/intelligence/journey/{customer_id}
 ```
 
----
-
-### CustomizableLayout
-
-Enterprise-level layout customization wrapper.
-
-```jsx
-import CustomizableLayout from './components/CustomizableLayout';
-```
-
-#### Props
-```typescript
+**Response:**
+```json
 {
-  children: React.ReactNode;
+  "customer_id": "user123",
+  "journey_score": 85.2,
+  "current_stage": "active_use",
+  "churn_risk": 0.15,
+  "predicted_ltv": 2450.00,
+  "touchpoints": [
+    {
+      "timestamp": "2024-01-15T10:30:00Z",
+      "type": "website_visit",
+      "channel": "organic",
+      "value": 1
+    }
+  ],
+  "key_moments": [
+    {
+      "moment_type": "first_contact",
+      "timestamp": "2024-01-01T14:22:00Z",
+      "significance": "Journey beginning",
+      "impact_score": 0.9
+    }
+  ]
 }
 ```
 
-**Features (Enterprise only):**
-- Dynamic grid columns (1-4)
-- Sidebar positioning
-- Widget arrangement
-- Layout persistence
-- Quick actions sidebar
+#### Behavioral Analysis
+Get comprehensive behavioral profile for a customer.
 
-**Example:**
-```jsx
-function Dashboard() {
-  return (
-    <CustomizableLayout>
-      <CustomerForm />
-      <AnalyticsWidget />
-      <ChurnMeter />
-      <ExportTools />
-    </CustomizableLayout>
-  );
-}
+```http
+GET /api/v1/intelligence/behavior/{customer_id}
 ```
 
----
-
-### PremiumAnalytics
-
-Advanced analytics dashboard with feature gating.
-
-```jsx
-import PremiumAnalytics from './components/PremiumAnalytics';
-```
-
-#### Props
-```typescript
+**Response:**
+```json
 {
-  data?: object;  // Optional analytics data
+  "customer_id": "user123",
+  "behavior_segment": "power_user",
+  "engagement_score": 78.5,
+  "usage_intensity": 0.85,
+  "feature_adoption_rate": 0.67,
+  "risk_indicators": {
+    "churn_risk": 0.12,
+    "engagement_decline": 0.05
+  },
+  "predicted_actions": [
+    {
+      "action": "feature_expansion",
+      "probability": 0.78,
+      "timeframe_days": 14
+    }
+  ],
+  "recommendations": [
+    {
+      "type": "engagement",
+      "title": "Introduce advanced features",
+      "priority": "high",
+      "confidence": 0.82
+    }
+  ]
 }
 ```
 
-**Features:**
-- Cohort analysis (Professional+)
-- Customer segmentation (Professional+)
-- Churn prediction insights (Professional+)
-- Basic metrics (all tiers)
+#### Customer LTV Prediction
+Predict customer lifetime value using ensemble models.
 
----
-
-### PerformanceMonitor
-
-Real-time performance tracking component.
-
-```jsx
-import PerformanceMonitor from './components/PerformanceMonitor';
+```http
+GET /api/v1/intelligence/ltv/{customer_id}
 ```
 
-#### Props
-- No props - self-contained monitoring
+**Query Parameters:**
+- `model_type` (string): ensemble, behavioral_predictive, cohort_based
+- `time_horizon_months` (integer): 12, 24, 36
 
-**Metrics Tracked:**
-- Load time
-- Theme switch performance
-- Memory usage
-- API response times
-- Frame rate
-- Overall performance score
-
----
-
-### UsageDashboard
-
-Displays current subscription usage and limits.
-
-```jsx
-import UsageDashboard from './components/UsageDashboard';
-```
-
-#### Props
-- No props - uses subscription context
-
-**Features:**
-- User count tracking
-- Data export usage
-- Feature availability status
-- Upgrade prompts for limits
-- Visual usage indicators
-
----
-
-### ExportFeature
-
-Data export functionality with subscription gating.
-
-```jsx
-import ExportFeature from './components/ExportFeature';
-```
-
-#### Props
-```typescript
+**Response:**
+```json
 {
-  data?: object;  // Data to export
+  "customer_id": "user123",
+  "predicted_ltv": 2450.00,
+  "confidence_interval": [1800.00, 3100.00],
+  "confidence_score": 0.78,
+  "ltv_segment": "high_value",
+  "value_components": {
+    "subscription_revenue": 1960.00,
+    "upsell_revenue": 340.00,
+    "referral_value": 150.00
+  },
+  "contributing_factors": [
+    {
+      "factor": "high_engagement",
+      "impact": 0.23,
+      "description": "Above-average product usage"
+    }
+  ]
 }
 ```
 
-**Features:**
-- JSON export format
-- CSV export format
-- Professional+ feature gating
-- Usage tracking integration
-- Download progress indication
+## 🧪 A/B Testing APIs
 
----
+### Experiment Management
 
-## Utility Functions
+#### Create Experiment
+Create a new A/B test experiment.
 
-### Test Utilities
-
-```jsx
-import { 
-  renderWithProviders, 
-  mockApiResponses, 
-  setupFetchMock,
-  createMockCustomer,
-  cleanup 
-} from './test-utils';
+```http
+POST /api/v1/experiments
 ```
 
-#### renderWithProviders(component, options)
-Renders components with all context providers for testing.
-
-**Options:**
-```typescript
+**Request Body:**
+```json
 {
-  theme?: 'light' | 'dark' | 'system';
-  subscription?: 'starter' | 'professional' | 'enterprise';
-  organization?: Partial<Organization>;
+  "name": "Landing Page CTA Test",
+  "description": "Test different call-to-action buttons",
+  "experiment_type": "ab_test",
+  "variants": [
+    {
+      "name": "Control",
+      "description": "Current blue button",
+      "traffic_allocation": 0.5,
+      "configuration": {
+        "button_color": "blue",
+        "button_text": "Get Started"
+      },
+      "is_control": true
+    },
+    {
+      "name": "Treatment",
+      "description": "New green button",
+      "traffic_allocation": 0.5,
+      "configuration": {
+        "button_color": "green",
+        "button_text": "Start Free Trial"
+      }
+    }
+  ],
+  "metrics": [
+    {
+      "name": "conversion_rate",
+      "type": "binary",
+      "is_primary": true,
+      "minimum_detectable_effect": 0.05
+    }
+  ]
 }
 ```
 
-#### setupFetchMock(responses)
-Configures fetch mocking for API calls.
-
-#### createMockCustomer(overrides)
-Factory for creating test customer data.
-
----
-
-## CSS Custom Properties
-
-### Theme Variables
-
-```css
-/* Root variables */
-:root {
-  --brand-primary: #DAA520;           /* Gold primary color */
-  --brand-primary-dark: #F4D03F;      /* Light gold for dark mode */
-  --brand-secondary: #B8860B;         /* Dark gold secondary */
-  --brand-secondary-dark: #F7DC6F;    /* Light secondary for dark mode */
-  
-  --background: #FFFFFF;              /* Light background */
-  --background-light: #FFFFFF;        /* Explicit light background */
-  --background-dark: #0F0F0F;         /* Dark background */
-  
-  --surface: #F8F9FA;                 /* Light surface */
-  --surface-light: #F8F9FA;           /* Explicit light surface */
-  --surface-dark: #1A1A1A;            /* Dark surface */
-}
-
-/* Dark mode overrides */
-.dark {
-  --background: var(--background-dark);
-  --surface: var(--surface-dark);
-  --brand-primary: var(--brand-primary-dark);
-  --brand-secondary: var(--brand-secondary-dark);
+**Response:**
+```json
+{
+  "experiment_id": "exp_abc123",
+  "status": "draft",
+  "created_at": "2024-01-15T10:30:00Z",
+  "sample_size_per_variant": 2500,
+  "estimated_runtime_days": 14
 }
 ```
 
-### Organization Variables
+#### Start Experiment
+Begin running an experiment.
 
-```css
-/* Set dynamically by OrganizationContext */
-:root {
-  --org-primary: var(--brand-primary);     /* Organization primary color */
-  --org-secondary: var(--brand-secondary); /* Organization secondary color */
-  --org-logo-url: '';                      /* Organization logo URL */
-  --org-name: 'ChurnGuard';                /* Organization name */
+```http
+POST /api/v1/experiments/{experiment_id}/start
+```
+
+**Response:**
+```json
+{
+  "experiment_id": "exp_abc123",
+  "status": "running",
+  "start_date": "2024-01-15T10:30:00Z",
+  "estimated_end_date": "2024-01-29T10:30:00Z"
 }
 ```
 
-### Usage in CSS
+#### Statistical Analysis
+Get comprehensive statistical analysis of experiment results.
 
-```css
-.branded-button {
-  background-color: var(--org-primary);
-  border-color: var(--org-secondary);
-  transition: all 0.2s ease;
-}
+```http
+GET /api/v1/experiments/{experiment_id}/analysis
+```
 
-.dark .branded-button {
-  /* Automatically uses dark mode colors */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+**Response:**
+```json
+{
+  "experiment_id": "exp_abc123",
+  "analysis_date": "2024-01-20T10:30:00Z",
+  "runtime_days": 5,
+  "total_participants": 1250,
+  "primary_metric_results": [
+    {
+      "metric_name": "conversion_rate",
+      "control_mean": 0.042,
+      "treatment_mean": 0.051,
+      "relative_improvement": 0.214,
+      "p_value": 0.003,
+      "is_significant": true,
+      "confidence_interval": [0.002, 0.016],
+      "statistical_power": 0.85
+    }
+  ],
+  "overall_conclusion": "significant",
+  "recommended_action": "deploy_treatment",
+  "confidence_score": 0.89
 }
 ```
 
----
+## 🎨 Theming APIs
 
-## Configuration
+### CSS Customization
 
-### Tailwind Configuration
+#### Create Theme
+Create a new CSS theme for organization.
+
+```http
+POST /api/v1/theming/themes
+```
+
+**Request Body:**
+```json
+{
+  "theme_name": "Corporate Blue Theme",
+  "description": "Professional theme with corporate branding"
+}
+```
+
+**Response:**
+```json
+{
+  "theme_id": "theme_xyz789",
+  "theme_name": "Corporate Blue Theme",
+  "created_at": "2024-01-15T10:30:00Z"
+}
+```
+
+#### Update CSS Scope
+Update CSS for specific application scope.
+
+```http
+PUT /api/v1/theming/themes/{theme_id}/css/{scope}
+```
+
+**Request Body:**
+```json
+{
+  "css_content": ".header { background-color: #007bff; color: white; }",
+  "validation_level": "moderate"
+}
+```
+
+**Response:**
+```json
+{
+  "is_valid": true,
+  "sanitized_css": ".header { background-color: #007bff; color: white; }",
+  "warnings": [],
+  "blocked_properties": []
+}
+```
+
+### Color Scheme Management
+
+#### Generate Color Palette
+Create organization-specific color scheme.
+
+```http
+POST /api/v1/theming/colors/palette
+```
+
+**Request Body:**
+```json
+{
+  "palette_name": "Acme Corp Brand Colors",
+  "primary_color": "#007bff",
+  "secondary_color": "#6c757d",
+  "theme_type": "light"
+}
+```
+
+**Response:**
+```json
+{
+  "palette_id": "pal_def456",
+  "primary": "#007bff",
+  "secondary": "#6c757d",
+  "accent": "#fd7e14",
+  "color_variants": {
+    "primary_100": "#cce7ff",
+    "primary_500": "#007bff",
+    "primary_900": "#003d7a"
+  },
+  "accessibility": {
+    "wcag_aa_compliant": true,
+    "contrast_ratios": {
+      "text_on_primary": 4.8
+    }
+  }
+}
+```
+
+### Custom Domain Management
+
+#### Add Custom Domain
+Configure custom domain for white-label deployment.
+
+```http
+POST /api/v1/theming/domains
+```
+
+**Request Body:**
+```json
+{
+  "domain_name": "app.acme.com",
+  "domain_type": "custom_domain",
+  "ssl_enabled": true,
+  "brand_name": "Acme Analytics"
+}
+```
+
+**Response:**
+```json
+{
+  "domain_id": "dom_ghi789",
+  "domain_name": "app.acme.com",
+  "status": "pending_verification",
+  "verification_token": "churnguard-domain-verification=abc123...",
+  "required_dns_records": [
+    {
+      "type": "CNAME",
+      "name": "app.acme.com",
+      "value": "custom.churnguard.ai",
+      "ttl": "300"
+    },
+    {
+      "type": "TXT",
+      "name": "_churnguard-challenge.app.acme.com",
+      "value": "churnguard-domain-verification=abc123...",
+      "ttl": "300"
+    }
+  ]
+}
+```
+
+## 📚 SDKs & Libraries
+
+### Python SDK
+```bash
+pip install churnguard-python
+```
+
+```python
+import churnguard
+
+client = churnguard.Client(api_key="your-key", organization_id="your-org")
+
+# Track events
+client.track_event("user123", "page_view", {"page": "/dashboard"})
+
+# Analyze customer
+profile = client.analyze_customer_behavior("user123")
+
+# Create A/B test
+experiment = client.create_experiment("Button Color Test", ["blue", "green"])
+```
+
+### JavaScript SDK
+```bash
+npm install @churnguard/sdk
+```
 
 ```javascript
-// tailwind.config.js
-module.exports = {
-  darkMode: 'class',  // Enable class-based dark mode
-  content: ["./src/**/*.{js,jsx,ts,tsx}"],
-  theme: {
-    extend: {
-      colors: {
-        primary: {
-          light: 'var(--brand-primary, #DAA520)',
-          dark: 'var(--brand-primary-dark, #F4D03F)',
-          DEFAULT: 'var(--brand-primary, #DAA520)'
-        },
-        // ... additional color definitions
-      }
+import ChurnGuard from '@churnguard/sdk';
+
+const client = new ChurnGuard({
+  apiKey: 'your-key',
+  organizationId: 'your-org'
+});
+
+// Track events
+await client.trackEvent('user123', 'page_view', {
+  page: '/dashboard'
+});
+
+// Get customer insights
+const insights = await client.getCustomerInsights('user123');
+```
+
+## 🚨 Error Handling
+
+All API errors follow a consistent format:
+
+```json
+{
+  "error": {
+    "code": "INVALID_REQUEST",
+    "message": "The request body contains invalid parameters",
+    "details": {
+      "field": "customer_id",
+      "reason": "Customer ID is required"
     },
-  },
-  plugins: [],
+    "request_id": "req_789abc"
+  }
 }
 ```
 
-### Environment Configuration
+### Common Error Codes
 
-```env
-# Optional environment variables
-REACT_APP_THEME_STORAGE_KEY=churnguard-theme
-REACT_APP_ORG_STORAGE_KEY=churnguard-organization
-REACT_APP_SUBSCRIPTION_STORAGE_KEY=churnguard-subscription-tier
-REACT_APP_USAGE_STORAGE_KEY=churnguard-usage
+- `INVALID_REQUEST` (400): Malformed request
+- `UNAUTHORIZED` (401): Invalid or missing API key
+- `FORBIDDEN` (403): Insufficient permissions
+- `NOT_FOUND` (404): Resource not found
+- `RATE_LIMITED` (429): Too many requests
+- `INTERNAL_ERROR` (500): Server error
 
-# Performance monitoring
-REACT_APP_PERFORMANCE_MONITORING=true
-REACT_APP_PERFORMANCE_SAMPLING_RATE=0.1
+## 🔒 Rate Limits
 
-# Analytics (optional)
-REACT_APP_ANALYTICS_ENABLED=false
-REACT_APP_ANALYTICS_ENDPOINT=your-analytics-endpoint
+API rate limits are enforced per organization:
+
+- **Standard**: 1,000 requests/minute
+- **Professional**: 5,000 requests/minute  
+- **Enterprise**: 25,000 requests/minute
+
+Rate limit headers are included in all responses:
+```http
+X-RateLimit-Limit: 1000
+X-RateLimit-Remaining: 999
+X-RateLimit-Reset: 1642248000
 ```
 
----
+## 📞 Support
 
-## Browser Support
-
-### Minimum Requirements
-- Chrome 76+ (CSS custom properties)
-- Firefox 72+ (CSS custom properties)
-- Safari 12.1+ (CSS custom properties)
-- Edge 79+ (Chromium-based)
-
-### Progressive Enhancement
-- Graceful degradation for older browsers
-- Fallback colors in CSS custom properties
-- Feature detection for advanced capabilities
-
-### Performance Considerations
-- Uses `prefers-color-scheme` media query
-- Optimized CSS transitions
-- Minimal JavaScript for theme switching
-- LocalStorage for theme persistence
-
----
-
-## Migration Guide
-
-### From v1.x to v2.x
-
-1. **Update Dependencies**
-   ```bash
-   npm install next-themes
-   ```
-
-2. **Wrap App with Providers**
-   ```jsx
-   // Before
-   <App />
-   
-   // After
-   <SubscriptionProvider>
-     <OrganizationProvider>
-       <ThemeProvider>
-         <App />
-       </ThemeProvider>
-     </OrganizationProvider>
-   </SubscriptionProvider>
-   ```
-
-3. **Update CSS Classes**
-   ```jsx
-   // Before
-   <div className="bg-gray-900 text-white">
-   
-   // After  
-   <div className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
-   ```
-
-4. **Add Feature Gates**
-   ```jsx
-   // Before
-   <PremiumFeature />
-   
-   // After
-   <FeatureGate feature="advancedAnalytics">
-     <PremiumFeature />
-   </FeatureGate>
-   ```
-
-5. **Test Theme Switching**
-   ```jsx
-   // Add theme toggle to your header
-   import ThemeToggle from './components/ThemeToggle';
-   
-   <header>
-     <Logo />
-     <ThemeToggle />
-   </header>
-   ```
+- **API Documentation**: https://docs.churnguard.ai
+- **Status Page**: https://status.churnguard.ai
+- **Support**: support@churnguard.ai

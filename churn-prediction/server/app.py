@@ -135,6 +135,7 @@ def explain_prediction(probability, input_dict, surname, churned_stats, non_chur
 #endpoint to get list of all customers
 @app.route('/api/customers', methods=['GET'])
 def get_customers():
+    # Hot reload test comment
     df = pd.read_csv('churn.csv')
     customers = df[['CustomerId', 'Surname']].to_dict(orient='records')
     return jsonify(customers)
