@@ -37,4 +37,4 @@ const App = () => {
   );
 };
 
-export default DashboardBuilder;
+export default App;
