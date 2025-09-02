@@ -36,7 +36,42 @@ const ChurnSummaryWidget = ({ data, config, onRefresh, refreshing }) => {
     }
   };
 
-  const summaryData = data || defaultData;
+  // Safely extract data with proper fallbacks
+  const getSummaryData = () => {
+    if (!data) return defaultData;
+    
+    // Handle API response format: { success: true, summary: {...} }
+    if (data.success && data.summary) {
+      return {
+        summary: data.summary,
+        risk_levels: data.risk_levels || defaultData.risk_levels,
+        trends: data.trends || defaultData.trends,
+        comparison: data.comparison || defaultData.comparison,
+        recent_activity: data.recent_activity || defaultData.recent_activity
+      };
+    }
+    
+    // Handle direct data format
+    if (data.summary || data.total_customers) {
+      return {
+        summary: data.summary || {
+          total_customers: data.total_customers || 0,
+          churned_customers: data.churned_customers || 0,
+          churn_rate: data.churn_rate || 0,
+          predicted_churn: data.predicted_churn || 0,
+          revenue_at_risk: data.revenue_at_risk || 0
+        },
+        risk_levels: data.risk_levels || defaultData.risk_levels,
+        trends: data.trends || defaultData.trends,
+        comparison: data.comparison || defaultData.comparison,
+        recent_activity: data.recent_activity || defaultData.recent_activity
+      };
+    }
+    
+    return defaultData;
+  };
+
+  const summaryData = getSummaryData();
 
   const formatCurrency = (value) => {
     return new Intl.NumberFormat('en-US', {
@@ -103,7 +138,7 @@ const ChurnSummaryWidget = ({ data, config, onRefresh, refreshing }) => {
             </div>
             <div className="text-2xl">📉</div>
           </div>
-          {showTrends && (
+          {showTrends && summaryData.trends && typeof summaryData.trends.churn_rate_change === 'number' && (
             <div className="flex items-center mt-2 text-sm">
               {getTrendIcon(summaryData.trends.churn_rate_change)}
               <span className={`ml-1 ${getTrendColor(summaryData.trends.churn_rate_change)}`}>
@@ -140,7 +175,7 @@ const ChurnSummaryWidget = ({ data, config, onRefresh, refreshing }) => {
             </div>
             <div className="text-2xl">⚠️</div>
           </div>
-          {showTrends && (
+          {showTrends && summaryData.trends && typeof summaryData.trends.high_risk_change === 'number' && (
             <div className="flex items-center mt-2 text-sm">
               {getTrendIcon(summaryData.trends.high_risk_change)}
               <span className={`ml-1 ${getTrendColor(summaryData.trends.high_risk_change)}`}>
@@ -195,7 +230,7 @@ const ChurnSummaryWidget = ({ data, config, onRefresh, refreshing }) => {
           <p className="text-2xl font-bold text-gray-900">
             {formatCurrency(summaryData.summary.revenue_at_risk)}
           </p>
-          {showTrends && (
+          {showTrends && summaryData.trends && typeof summaryData.trends.revenue_change === 'number' && (
             <div className="flex items-center mt-2 text-sm">
               {getTrendIcon(summaryData.trends.revenue_change)}
               <span className={`ml-1 ${getTrendColor(summaryData.trends.revenue_change)}`}>
