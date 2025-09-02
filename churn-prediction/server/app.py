@@ -73,11 +73,14 @@ def prepare_input(credit_score, location, gender, age, tenure, balance, num_prod
 # Helper function to make predictions using all models
 def make_predictions(input_df):
     probabilities = {}
+    # Convert DataFrame to numpy array to avoid feature name warnings
+    input_array = input_df.values
+    
     # Loop through models and add probabilities
     for model_name, model in models.items():
         try:
-            # Convert model predictions to Python float
-            probabilities[model_name] = float(model.predict_proba(input_df)[0][1])
+            # Convert model predictions to Python float using numpy array
+            probabilities[model_name] = float(model.predict_proba(input_array)[0][1])
         except Exception as e:
             probabilities[model_name] = f"Error: {str(e)}"
 
