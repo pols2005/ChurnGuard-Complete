@@ -13,7 +13,24 @@ const ChurnTrendWidget = ({ data, config, onRefresh, refreshing }) => {
     customerCount: [1200, 1180, 1165, 1142, 1158, 1250]
   };
 
-  const trendData = data || mockData;
+  // Extract trend data from API response structure
+  const getTrendData = () => {
+    if (!data) return mockData;
+    
+    // Handle API response format: { success: true, trend: { labels: [...], churnRate: [...] } }
+    if (data.success && data.trend) {
+      return data.trend;
+    }
+    
+    // Handle direct data format
+    if (data.labels && data.churnRate) {
+      return data;
+    }
+    
+    return mockData;
+  };
+
+  const trendData = getTrendData();
 
   return (
     <div className="h-full">
