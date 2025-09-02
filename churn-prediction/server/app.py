@@ -258,7 +258,7 @@ def get_explanation_with_email(customer_id):
     raw_response = client.chat.completions.create(
         model="gemma2-9b-it",
         messages=[
-            {"role": "user", "content": prompt}
+            {"role": "user", "content": email_prompt}
         ]
     )
 
@@ -380,8 +380,8 @@ def get_churn_summary():
 
 @app.route('/api/v2/analytics/churn-trend', methods=['GET'])
 def get_churn_trend():
-    # Mock trend data - in real implementation, this would come from time-series data
-    trend_data = [
+    # Mock trend data formatted for ChurnTrendWidget
+    raw_data = [
         {"month": "Jan", "churn_rate": 18.5, "predictions": 19.2},
         {"month": "Feb", "churn_rate": 17.8, "predictions": 18.1},
         {"month": "Mar", "churn_rate": 19.2, "predictions": 18.9},
@@ -389,6 +389,15 @@ def get_churn_trend():
         {"month": "May", "churn_rate": 15.8, "predictions": 16.1},
         {"month": "Jun", "churn_rate": 17.1, "predictions": 16.8}
     ]
+    
+    # Transform to format expected by ChurnTrendWidget
+    trend_data = {
+        "labels": [item["month"] for item in raw_data],
+        "churnRate": [item["churn_rate"] for item in raw_data],
+        "predictions": [item["predictions"] for item in raw_data],
+        "customerCount": [1200, 1180, 1165, 1142, 1158, 1250]  # Mock customer counts
+    }
+    
     return jsonify({"success": True, "trend": trend_data})
 
 @app.route('/api/v2/analytics/risk-distribution', methods=['GET'])
