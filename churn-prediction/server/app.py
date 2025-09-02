@@ -13,7 +13,7 @@ load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, supports_credentials=True, origins=["http://18.116.240.47:3000", "http://localhost:3000"])
 
 #initialize open AI client
 client = OpenAI(
@@ -258,7 +258,7 @@ def get_explanation_with_email(customer_id):
     raw_response = client.chat.completions.create(
         model="gemma2-9b-it",
         messages=[
-            {"role": "user", "content": email_prompt}
+            {"role": "user", "content": prompt}
         ]
     )
 
