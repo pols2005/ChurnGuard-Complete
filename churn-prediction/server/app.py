@@ -13,7 +13,7 @@ load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, supports_credentials=True, origins=["http://18.116.240.47:3000"])
 
 #initialize open AI client
 client = OpenAI(
@@ -33,7 +33,7 @@ models = {
     # 'GaussianNB': load_model('nb_model.pkl'),
     'KNeighbors': load_model('knn_model.pkl'),
     # 'SVC': load_model('svm_model.pkl'),
-    'GBoosting': load_model('gb_model.pkl'),
+    # 'GBoosting': load_model('gb_model.pkl'),
     # 'LogisticReg': load_model('lr_model.pkl'),
     'ExtraTrees': load_model('et_model.pkl'),
     'AdaBoost': load_model('ab_model.pkl')
@@ -285,23 +285,34 @@ def get_feature_percentiles(customer_id):
             percentiles[feature] = f"Error: {str(e)}"
     return jsonify({'customer_id': customer_id, 'percentiles': percentiles})
 
-
-
-
-
-
-
-
-
-
-
-
+# Auth endpoints for dashboard
+@app.route('/api/auth/me', methods=['GET'])
+def get_current_user():
+    # Mock user data for dashboard functionality
+    return jsonify({
+        "user": {
+            "id": 1,
+            "email": "demo@churnguard.com",
+            "name": "Demo User",
+            "role": "admin",
+            "is_admin": True
+        },
+        "organization": {
+            "id": "org-1",
+            "name": "Demo Organization",
+            "subscription_tier": "enterprise"
+        },
+        "permissions": [
+            "dashboard.edit", "analytics.read", "customer.read",
+            "prediction.read", "export.create", "audit.read",
+            "user.read"
+        ]
+    })
 
 #for running on local
 # if __name__ == '__main__':
 #     app.run(debug=True, port=5001)
 
-#for deplyment on Render
+#for deployment on Render
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
-
