@@ -23,21 +23,30 @@ client = OpenAI(
 
 # Load models at the start of the application
 def load_model(filename):
-    with open(filename, 'rb') as file:
-        return pickle.load(file)
+    try:
+        with open(filename, 'rb') as file:
+            return pickle.load(file)
+    except Exception as e:
+        print(f"Warning: Could not load model {filename}: {str(e)}")
+        return None
 
-models = {
-    'XGBoost': load_model('xgb_model.pkl'),
-    # 'DecisionTree': load_model('dt_model.pkl'),
-    # 'RandomForest': load_model('rf_model.pkl'),
-    # 'GaussianNB': load_model('nb_model.pkl'),
-    'KNeighbors': load_model('knn_model.pkl'),
-    # 'SVC': load_model('svm_model.pkl'),
-    'GBoosting': load_model('gb_model.pkl'),
-    # 'LogisticReg': load_model('lr_model.pkl'),
-    'ExtraTrees': load_model('et_model.pkl'),
-    'AdaBoost': load_model('ab_model.pkl')
+# Load models with error handling
+model_files = {
+    'XGBoost': 'xgb_model.pkl',
+    'KNeighbors': 'knn_model.pkl',
+    'ExtraTrees': 'et_model.pkl',
+    'AdaBoost': 'ab_model.pkl'
+    # 'GBoosting': 'gb_model.pkl',  # Commented out due to scikit-learn version compatibility
 }
+
+models = {}
+for name, filename in model_files.items():
+    model = load_model(filename)
+    if model is not None:
+        models[name] = model
+        print(f"Successfully loaded {name} model")
+    else:
+        print(f"Failed to load {name} model")
 
 # Helper function to prepare input for the models
 def prepare_input(credit_score, location, gender, age, tenure, balance, num_products, has_credit_card, is_active_member, estimated_salary):
