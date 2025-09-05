@@ -1,125 +1,56 @@
-# ChurnGuard Infrastructure Outputs
-# Terraform outputs for resource information and connection details
-
-#===============================================================================
 # VPC Outputs
-#===============================================================================
-
 output "vpc_id" {
-  description = "VPC ID"
+  description = "ID of the VPC"
   value       = module.vpc.vpc_id
 }
 
 output "vpc_cidr_block" {
-  description = "VPC CIDR block"
+  description = "CIDR block of the VPC"
   value       = module.vpc.vpc_cidr_block
 }
 
-output "private_subnets" {
-  description = "List of private subnet IDs"
-  value       = module.vpc.private_subnets
+output "public_subnet_ids" {
+  description = "IDs of the public subnets"
+  value       = module.vpc.public_subnet_ids
 }
 
-output "public_subnets" {
-  description = "List of public subnet IDs"
-  value       = module.vpc.public_subnets
+output "private_subnet_ids" {
+  description = "IDs of the private subnets"
+  value       = module.vpc.private_subnet_ids
 }
 
-output "database_subnets" {
-  description = "List of database subnet IDs"
-  value       = module.vpc.database_subnets
+output "database_subnet_ids" {
+  description = "IDs of the database subnets"
+  value       = module.vpc.database_subnet_ids
 }
 
-output "nat_gateway_ips" {
-  description = "List of NAT Gateway public IPs"
-  value       = module.vpc.nat_public_ips
+# Security Groups Outputs
+output "security_groups" {
+  description = "Security group IDs"
+  value = {
+    alb         = module.security_groups.alb_security_group_id
+    eks_cluster = module.security_groups.eks_cluster_security_group_id
+    eks_nodes   = module.security_groups.eks_nodes_security_group_id
+    rds         = module.security_groups.rds_security_group_id
+    redis       = module.security_groups.redis_security_group_id
+  }
 }
 
-#===============================================================================
-# Security Group Outputs
-#===============================================================================
-
-output "alb_security_group_id" {
-  description = "Application Load Balancer security group ID"
-  value       = module.security_groups.alb_security_group_id
-}
-
-output "eks_security_group_id" {
-  description = "EKS cluster security group ID"
-  value       = module.security_groups.eks_security_group_id
-}
-
-output "rds_security_group_id" {
-  description = "RDS security group ID"
-  value       = module.security_groups.rds_security_group_id
-}
-
-output "redis_security_group_id" {
-  description = "Redis security group ID"
-  value       = module.security_groups.redis_security_group_id
-}
-
-#===============================================================================
-# IAM Outputs
-#===============================================================================
-
-output "eks_cluster_role_arn" {
-  description = "EKS cluster IAM role ARN"
-  value       = module.iam.eks_cluster_role_arn
-}
-
-output "eks_node_group_role_arn" {
-  description = "EKS node group IAM role ARN"
-  value       = module.iam.eks_node_group_role_arn
-}
-
-output "eks_pod_execution_role_arn" {
-  description = "EKS pod execution IAM role ARN"
-  value       = module.iam.eks_pod_execution_role_arn
-}
-
-#===============================================================================
 # S3 Outputs
-#===============================================================================
-
-output "app_storage_bucket" {
-  description = "Application storage S3 bucket name"
-  value       = module.s3.app_storage_bucket
+output "s3_buckets" {
+  description = "S3 bucket information"
+  value = {
+    app_storage = module.s3.app_storage_bucket_id
+    backups     = module.s3.backups_bucket_id
+    logs        = module.s3.logs_bucket_id
+  }
 }
 
-output "logs_bucket" {
-  description = "Logs S3 bucket name"
-  value       = module.s3.logs_bucket
-}
-
-output "backup_bucket" {
-  description = "Backup S3 bucket name"
-  value       = module.s3.backup_bucket
-}
-
-output "terraform_state_bucket" {
-  description = "Terraform state S3 bucket name"
-  value       = module.s3.terraform_state_bucket
-}
-
-#===============================================================================
 # RDS Outputs
-#===============================================================================
-
-output "rds_instance_endpoint" {
+output "rds_endpoint" {
   description = "RDS instance endpoint"
   value       = module.rds.db_instance_endpoint
   sensitive   = true
-}
-
-output "rds_instance_id" {
-  description = "RDS instance ID"
-  value       = module.rds.db_instance_identifier
-}
-
-output "rds_database_name" {
-  description = "RDS database name"
-  value       = module.rds.db_instance_name
 }
 
 output "rds_port" {
@@ -127,202 +58,165 @@ output "rds_port" {
   value       = module.rds.db_instance_port
 }
 
-output "rds_instance_arn" {
-  description = "RDS instance ARN"
-  value       = module.rds.db_instance_arn
+output "rds_db_name" {
+  description = "RDS database name"
+  value       = module.rds.db_instance_name
 }
 
-#===============================================================================
-# ElastiCache Redis Outputs
-#===============================================================================
+output "rds_password_secret_arn" {
+  description = "ARN of the secret containing RDS password"
+  value       = module.rds.db_password_secret_arn
+}
 
-output "redis_cluster_endpoint" {
-  description = "ElastiCache Redis cluster endpoint"
-  value       = module.redis.redis_cluster_endpoint
+# ElastiCache Outputs
+output "redis_endpoint" {
+  description = "Redis primary endpoint"
+  value       = module.elasticache.primary_endpoint_address
   sensitive   = true
 }
 
-output "redis_cluster_id" {
-  description = "ElastiCache Redis cluster ID"
-  value       = module.redis.redis_cluster_id
-}
-
 output "redis_port" {
-  description = "ElastiCache Redis port"
-  value       = module.redis.redis_port
+  description = "Redis port"
+  value       = module.elasticache.port
 }
 
-output "redis_parameter_group_name" {
-  description = "ElastiCache parameter group name"
-  value       = module.redis.redis_parameter_group_name
+output "redis_auth_token_secret_arn" {
+  description = "ARN of the secret containing Redis auth token"
+  value       = module.elasticache.auth_token_secret_arn
 }
 
-#===============================================================================
 # ALB Outputs
-#===============================================================================
-
 output "alb_dns_name" {
-  description = "Application Load Balancer DNS name"
-  value       = module.alb.alb_dns_name
+  description = "DNS name of the load balancer"
+  value       = module.alb.load_balancer_dns_name
 }
 
 output "alb_zone_id" {
-  description = "Application Load Balancer zone ID"
-  value       = module.alb.alb_zone_id
+  description = "Hosted zone ID of the load balancer"
+  value       = module.alb.load_balancer_zone_id
 }
 
 output "alb_arn" {
-  description = "Application Load Balancer ARN"
-  value       = module.alb.alb_arn
+  description = "ARN of the load balancer"
+  value       = module.alb.load_balancer_arn
 }
 
-output "alb_listener_arn" {
-  description = "Application Load Balancer listener ARN"
-  value       = module.alb.alb_listener_arn
+output "alb_target_group_arn" {
+  description = "ARN of the default target group"
+  value       = module.alb.default_target_group_arn
 }
 
-#===============================================================================
 # EKS Outputs
-#===============================================================================
-
-output "eks_cluster_name" {
-  description = "EKS cluster name"
-  value       = module.eks.cluster_name
+output "eks_cluster_id" {
+  description = "Name of the EKS cluster"
+  value       = module.eks.cluster_id
 }
 
 output "eks_cluster_endpoint" {
-  description = "EKS cluster endpoint"
+  description = "Endpoint for EKS control plane"
   value       = module.eks.cluster_endpoint
   sensitive   = true
 }
 
-output "eks_cluster_version" {
-  description = "EKS cluster Kubernetes version"
-  value       = module.eks.cluster_version
-}
-
-output "eks_cluster_arn" {
-  description = "EKS cluster ARN"
-  value       = module.eks.cluster_arn
+output "eks_cluster_security_group_id" {
+  description = "Security group ID attached to the EKS cluster"
+  value       = module.eks.cluster_primary_security_group_id
 }
 
 output "eks_cluster_certificate_authority_data" {
-  description = "EKS cluster certificate authority data"
+  description = "Base64 encoded certificate data required to communicate with the cluster"
   value       = module.eks.cluster_certificate_authority_data
-  sensitive   = true
 }
 
-output "eks_cluster_security_group_id" {
-  description = "EKS cluster security group ID"
-  value       = module.eks.cluster_security_group_id
-}
-
-output "eks_node_groups" {
-  description = "EKS node groups information"
-  value       = module.eks.node_groups
+output "eks_cluster_version" {
+  description = "The Kubernetes version for the EKS cluster"
+  value       = module.eks.cluster_version
 }
 
 output "eks_oidc_issuer_url" {
-  description = "EKS OIDC issuer URL"
+  description = "The URL on the EKS cluster OIDC Issuer"
   value       = module.eks.cluster_oidc_issuer_url
 }
 
-#===============================================================================
-# CloudWatch Outputs
-#===============================================================================
-
-output "cloudwatch_log_group_name" {
-  description = "CloudWatch log group name"
-  value       = module.monitoring.cloudwatch_log_group_name
+output "eks_node_groups" {
+  description = "EKS node groups"
+  value       = module.eks.node_groups
 }
 
-output "cloudwatch_log_group_arn" {
-  description = "CloudWatch log group ARN"
-  value       = module.monitoring.cloudwatch_log_group_arn
+# Monitoring Outputs
+output "monitoring_dashboard_url" {
+  description = "CloudWatch dashboard URL"
+  value       = var.enable_monitoring ? module.monitoring[0].dashboard_url : null
 }
 
-#===============================================================================
-# Route53 Outputs (Optional)
-#===============================================================================
-
-output "route53_zone_id" {
-  description = "Route53 hosted zone ID"
-  value       = var.domain_name != "" ? module.route53[0].zone_id : null
+output "monitoring_sns_topic_arn" {
+  description = "SNS topic ARN for monitoring alerts"
+  value       = var.enable_monitoring ? module.monitoring[0].sns_topic_arn : null
 }
 
-output "route53_zone_name" {
-  description = "Route53 hosted zone name"
-  value       = var.domain_name != "" ? module.route53[0].zone_name : null
-}
-
-output "route53_name_servers" {
-  description = "Route53 name servers"
-  value       = var.domain_name != "" ? module.route53[0].name_servers : null
-}
-
-#===============================================================================
-# Connection Information
-#===============================================================================
-
-output "connection_info" {
-  description = "Connection information for accessing infrastructure"
+# kubectl Configuration
+output "kubectl_config" {
+  description = "kubectl configuration command"
   value = {
-    application_url = var.domain_name != "" ? "https://${var.domain_name}" : "https://${module.alb.alb_dns_name}"
-    
+    command = "aws eks update-kubeconfig --region ${var.aws_region} --name ${var.project_name}-${var.environment}-cluster"
+    region  = var.aws_region
+    cluster = "${var.project_name}-${var.environment}-cluster"
+  }
+}
+
+# Connection Information
+output "connection_info" {
+  description = "Connection information for services"
+  value = {
     database = {
-      host     = module.rds.db_instance_address
+      endpoint = module.rds.db_instance_endpoint
       port     = module.rds.db_instance_port
-      database = module.rds.db_instance_name
+      name     = module.rds.db_instance_name
+      secret_arn = module.rds.db_password_secret_arn
     }
-    
     redis = {
-      host = module.redis.redis_cluster_address
-      port = module.redis.redis_port
+      endpoint = module.elasticache.primary_endpoint_address
+      port     = module.elasticache.port
+      secret_arn = module.elasticache.auth_token_secret_arn
     }
-    
-    kubernetes = {
-      cluster_name = module.eks.cluster_name
-      endpoint     = module.eks.cluster_endpoint
+    load_balancer = {
+      dns_name = module.alb.load_balancer_dns_name
+      zone_id  = module.alb.load_balancer_zone_id
+      https_endpoint = module.alb.https_endpoint
     }
   }
   sensitive = true
 }
 
-#===============================================================================
-# Environment Information
-#===============================================================================
-
-output "environment_info" {
-  description = "Environment and deployment information"
+# Deployment Information
+output "deployment_info" {
+  description = "Information needed for application deployment"
   value = {
-    environment    = var.environment
-    region        = var.aws_region
-    project       = var.project_name
-    deployment_time = timestamp()
-    terraform_version = "~> 1.5.0"
+    project_name       = var.project_name
+    environment        = var.environment
+    region            = var.aws_region
+    vpc_id            = module.vpc.vpc_id
+    private_subnets   = module.vpc.private_subnet_ids
+    security_groups = {
+      alb       = module.security_groups.alb_security_group_id
+      eks_nodes = module.security_groups.eks_nodes_security_group_id
+    }
+    target_group_arn = module.alb.default_target_group_arn
   }
 }
 
-#===============================================================================
-# Cost Estimation Tags
-#===============================================================================
-
-output "cost_center_tags" {
-  description = "Tags for cost center tracking"
+# Resource ARNs for IAM Policies
+output "resource_arns" {
+  description = "ARNs of created resources for IAM policy references"
   value = {
-    Project     = "ChurnGuard"
-    Environment = var.environment
-    CostCenter  = "Engineering"
-    Owner       = var.owner
-    ManagedBy   = "Terraform"
+    s3_buckets = {
+      app_storage = module.s3.app_storage_bucket_arn
+      backups     = module.s3.backups_bucket_arn
+      logs        = module.s3.logs_bucket_arn
+    }
+    secrets_manager = {
+      rds_password = module.rds.db_password_secret_arn
+      redis_token  = module.elasticache.auth_token_secret_arn
+    }
   }
-}
-
-#===============================================================================
-# kubectl Configuration Command
-#===============================================================================
-
-output "kubectl_config_command" {
-  description = "Command to configure kubectl for EKS cluster"
-  value       = "aws eks update-kubeconfig --region ${var.aws_region} --name ${module.eks.cluster_name}"
 }

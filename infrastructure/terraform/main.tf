@@ -1,313 +1,253 @@
-# ChurnGuard Infrastructure as Code
-# Main Terraform configuration for AWS cloud deployment
-
 terraform {
   required_version = ">= 1.5.0"
-  
   required_providers {
     aws = {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
-    kubernetes = {
-      source  = "hashicorp/kubernetes"
-      version = "~> 2.20"
-    }
-    helm = {
-      source  = "hashicorp/helm"
-      version = "~> 2.10"
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.1"
     }
   }
 
-  # Backend configuration for remote state management
   backend "s3" {
-    # These values should be provided via backend config file or CLI
-    # bucket         = "churnguard-terraform-state-${environment}"
-    # key            = "infrastructure/terraform.tfstate"
-    # region         = var.aws_region
-    # encrypt        = true
-    # dynamodb_table = "churnguard-terraform-locks-${environment}"
+    # Backend configuration will be provided via backend config file
+    # Example: terraform init -backend-config=backend-dev.conf
   }
 }
 
-# Configure AWS Provider
 provider "aws" {
   region = var.aws_region
-  
+
   default_tags {
-    tags = {
-      Project     = "ChurnGuard"
-      Environment = var.environment
-      ManagedBy   = "Terraform"
-      Owner       = var.owner
-    }
+    tags = local.common_tags
   }
 }
 
-# Configure Kubernetes provider
-provider "kubernetes" {
-  host                   = module.eks.cluster_endpoint
-  cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
-  
-  exec {
-    api_version = "client.authentication.k8s.io/v1beta1"
-    command     = "aws"
-    args        = ["eks", "get-token", "--cluster-name", module.eks.cluster_name]
-  }
-}
-
-# Configure Helm provider
-provider "helm" {
-  kubernetes {
-    host                   = module.eks.cluster_endpoint
-    cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
-    
-    exec {
-      api_version = "client.authentication.k8s.io/v1beta1"
-      command     = "aws"
-      args        = ["eks", "get-token", "--cluster-name", module.eks.cluster_name]
-    }
-  }
-}
-
-# Data sources
-data "aws_availability_zones" "available" {
-  state = "available"
-}
-
-data "aws_caller_identity" "current" {}
-
-# Local values
 locals {
-  name = "churnguard-${var.environment}"
-  
-  # Calculate subnet CIDRs
-  vpc_cidr = var.vpc_cidr
-  azs      = slice(data.aws_availability_zones.available.names, 0, 3)
-  
-  # Create subnet CIDRs dynamically
-  public_subnets  = [for i in range(3) : cidrsubnet(local.vpc_cidr, 8, i)]
-  private_subnets = [for i in range(3) : cidrsubnet(local.vpc_cidr, 8, i + 10)]
-  database_subnets = [for i in range(3) : cidrsubnet(local.vpc_cidr, 8, i + 20)]
-  
-  tags = {
-    Project     = "ChurnGuard"
+  common_tags = {
+    Project     = var.project_name
     Environment = var.environment
     ManagedBy   = "Terraform"
+    CreatedAt   = formatdate("YYYY-MM-DD", timestamp())
   }
 }
 
-#===============================================================================
-# VPC and Networking
-#===============================================================================
-
+# Module Calls
 module "vpc" {
   source = "./modules/vpc"
-  
-  name = local.name
-  cidr = local.vpc_cidr
-  
-  azs                 = local.azs
-  public_subnets      = local.public_subnets
-  private_subnets     = local.private_subnets
-  database_subnets    = local.database_subnets
-  
-  enable_nat_gateway     = true
-  enable_vpn_gateway     = false
-  enable_dns_hostnames   = true
-  enable_dns_support     = true
-  
-  # Enable VPC Flow Logs
-  enable_flow_log                      = true
-  create_flow_log_cloudwatch_log_group = true
-  create_flow_log_cloudwatch_iam_role  = true
-  
-  tags = local.tags
-}
 
-#===============================================================================
-# Security Groups
-#===============================================================================
+  project_name = var.project_name
+  environment  = var.environment
+  cidr         = var.vpc_cidr
+  azs          = var.availability_zones
+
+  public_subnets   = var.public_subnet_cidrs
+  private_subnets  = var.private_subnet_cidrs
+  database_subnets = var.database_subnet_cidrs
+
+  enable_nat_gateway   = var.enable_nat_gateway
+  enable_vpn_gateway   = var.enable_vpn_gateway
+  enable_dns_hostnames = var.enable_dns_hostnames
+  enable_dns_support   = var.enable_dns_support
+  enable_flow_log      = var.enable_vpc_flow_logs
+
+  tags = local.common_tags
+}
 
 module "security_groups" {
   source = "./modules/security-groups"
-  
-  name   = local.name
-  vpc_id = module.vpc.vpc_id
-  
-  tags = local.tags
-}
 
-#===============================================================================
-# IAM Roles and Policies
-#===============================================================================
+  project_name = var.project_name
+  environment  = var.environment
+  vpc_id       = module.vpc.vpc_id
+
+  create_bastion_sg = var.create_bastion_host
+
+  tags = local.common_tags
+}
 
 module "iam" {
   source = "./modules/iam"
-  
-  name        = local.name
-  environment = var.environment
-  
-  tags = local.tags
-}
 
-#===============================================================================
-# S3 Buckets
-#===============================================================================
+  project_name = var.project_name
+  environment  = var.environment
+  aws_region   = var.aws_region
+
+  enable_load_balancer_controller = var.enable_aws_load_balancer_controller
+
+  tags = local.common_tags
+}
 
 module "s3" {
   source = "./modules/s3"
-  
-  name        = local.name
-  environment = var.environment
-  
-  tags = local.tags
-}
 
-#===============================================================================
-# RDS PostgreSQL Database
-#===============================================================================
+  project_name = var.project_name
+  environment  = var.environment
+
+  enable_versioning                             = var.s3_enable_versioning
+  enable_lifecycle_rules                       = var.s3_enable_lifecycle_rules
+  lifecycle_expiration_days                     = var.s3_lifecycle_expiration_days
+  lifecycle_noncurrent_version_expiration_days  = var.s3_lifecycle_noncurrent_version_expiration_days
+  backup_retention_days                         = var.s3_backup_retention_days
+  log_retention_days                           = var.s3_log_retention_days
+  enable_log_bucket                            = var.s3_enable_log_bucket
+  create_terraform_state_bucket                = var.s3_create_terraform_state_bucket
+
+  tags = local.common_tags
+}
 
 module "rds" {
   source = "./modules/rds"
-  
-  name        = local.name
-  environment = var.environment
-  
-  vpc_id                = module.vpc.vpc_id
-  db_subnet_group_name  = module.vpc.database_subnet_group
-  security_group_ids    = [module.security_groups.rds_security_group_id]
-  
-  # Database configuration
-  engine_version    = var.rds_engine_version
-  instance_class    = var.rds_instance_class
-  allocated_storage = var.rds_allocated_storage
-  
-  # High availability
-  multi_az               = var.environment == "production"
-  backup_retention_period = var.environment == "production" ? 30 : 7
-  
-  # Security
-  deletion_protection = var.environment == "production"
-  skip_final_snapshot = var.environment != "production"
-  
-  tags = local.tags
+
+  project_name         = var.project_name
+  environment          = var.environment
+  database_subnet_ids  = module.vpc.database_subnet_ids
+  security_group_ids   = [module.security_groups.rds_security_group_id]
+
+  postgres_version              = var.rds_postgres_version
+  postgres_major_version        = var.rds_postgres_major_version
+  instance_class                = var.rds_instance_class
+  allocated_storage             = var.rds_allocated_storage
+  max_allocated_storage         = var.rds_max_allocated_storage
+  storage_encrypted             = var.rds_storage_encrypted
+  db_name                       = var.rds_db_name
+  db_username                   = var.rds_db_username
+  backup_retention_period       = var.rds_backup_retention_period
+  multi_az                      = var.rds_multi_az
+  monitoring_interval           = var.rds_monitoring_interval
+  performance_insights_enabled  = var.rds_performance_insights_enabled
+  deletion_protection           = var.rds_deletion_protection
+  create_read_replica           = var.rds_create_read_replica
+
+  tags = local.common_tags
 }
 
-#===============================================================================
-# ElastiCache Redis Cluster
-#===============================================================================
+module "elasticache" {
+  source = "./modules/elasticache"
 
-module "redis" {
-  source = "./modules/redis"
-  
-  name        = local.name
-  environment = var.environment
-  
-  subnet_group_name  = module.vpc.elasticache_subnet_group_name
+  project_name       = var.project_name
+  environment        = var.environment
+  subnet_ids         = module.vpc.database_subnet_ids
   security_group_ids = [module.security_groups.redis_security_group_id]
-  
-  # Cluster configuration
-  node_type               = var.redis_node_type
-  num_cache_clusters      = var.redis_num_cache_clusters
-  parameter_group_name    = var.redis_parameter_group_name
-  engine_version         = var.redis_engine_version
-  
-  # High availability
-  automatic_failover_enabled = var.environment == "production"
-  multi_az_enabled          = var.environment == "production"
-  
-  tags = local.tags
-}
 
-#===============================================================================
-# Application Load Balancer
-#===============================================================================
+  redis_version                = var.elasticache_redis_version
+  node_type                    = var.elasticache_node_type
+  num_cache_clusters           = var.elasticache_num_cache_clusters
+  cluster_mode_enabled         = var.elasticache_cluster_mode_enabled
+  multi_az_enabled             = var.elasticache_multi_az_enabled
+  automatic_failover_enabled   = var.elasticache_automatic_failover_enabled
+  at_rest_encryption_enabled   = var.elasticache_at_rest_encryption_enabled
+  transit_encryption_enabled   = var.elasticache_transit_encryption_enabled
+  auth_token_enabled           = var.elasticache_auth_token_enabled
+  snapshot_retention_limit     = var.elasticache_snapshot_retention_limit
+
+  tags = local.common_tags
+}
 
 module "alb" {
   source = "./modules/alb"
-  
-  name        = local.name
-  environment = var.environment
-  
-  vpc_id             = module.vpc.vpc_id
-  subnets            = module.vpc.public_subnets
-  security_group_ids = [module.security_groups.alb_security_group_id]
-  
-  # SSL configuration
-  ssl_certificate_arn = var.ssl_certificate_arn
-  
-  tags = local.tags
-}
 
-#===============================================================================
-# EKS Cluster
-#===============================================================================
+  project_name       = var.project_name
+  environment        = var.environment
+  vpc_id             = module.vpc.vpc_id
+  subnet_ids         = module.vpc.public_subnet_ids
+  security_group_ids = [module.security_groups.alb_security_group_id]
+
+  internal                    = var.alb_internal
+  enable_deletion_protection  = var.alb_enable_deletion_protection
+  enable_https                = var.alb_enable_https
+  certificate_arn             = var.alb_certificate_arn
+  ssl_policy                  = var.alb_ssl_policy
+  enable_access_logs          = var.alb_enable_access_logs
+  access_logs_bucket          = var.alb_enable_access_logs ? module.s3.logs_bucket_id : null
+  health_check_path           = var.alb_health_check_path
+
+  tags = local.common_tags
+}
 
 module "eks" {
   source = "./modules/eks"
-  
-  name        = local.name
-  environment = var.environment
-  
-  vpc_id                    = module.vpc.vpc_id
-  subnet_ids               = module.vpc.private_subnets
-  control_plane_subnet_ids = module.vpc.private_subnets
-  
-  # Cluster configuration
-  cluster_version = var.eks_cluster_version
-  
-  # Node groups
-  node_groups = var.eks_node_groups
-  
-  # Security
-  cluster_security_group_additional_rules = {
-    ingress_alb = {
-      description = "ALB to cluster communication"
-      protocol    = "tcp"
-      from_port   = 443
-      to_port     = 443
-      type        = "ingress"
-      source_security_group_id = module.security_groups.alb_security_group_id
+
+  project_name       = var.project_name
+  environment        = var.environment
+  vpc_id             = module.vpc.vpc_id
+  private_subnet_ids = module.vpc.private_subnet_ids
+  public_subnet_ids  = module.vpc.public_subnet_ids
+
+  cluster_service_role_arn = module.iam.eks_cluster_role_arn
+  node_group_role_arn      = module.iam.eks_node_group_role_arn
+
+  kubernetes_version           = var.eks_kubernetes_version
+  endpoint_private_access      = true
+  endpoint_public_access       = true
+  enable_irsa                  = true
+  enable_aws_load_balancer_controller = var.enable_aws_load_balancer_controller
+  aws_load_balancer_controller_policy_arn = module.iam.load_balancer_controller_role_arn
+
+  node_groups = {
+    for k, v in var.eks_node_groups : k => {
+      capacity_type                = v.capacity_type
+      instance_types               = v.instance_types
+      ami_type                     = "AL2_x86_64"
+      disk_size                    = v.disk_size
+      desired_size                 = v.desired_size
+      max_size                     = v.max_size
+      min_size                     = v.min_size
+      max_unavailable_percentage   = 25
+      launch_template_id           = null
+      launch_template_version      = null
+      enable_remote_access         = false
+      key_name                     = null
+      source_security_group_ids    = []
+      labels                       = {}
+      taints                       = []
+      tags                         = {}
     }
   }
-  
-  tags = local.tags
-}
 
-#===============================================================================
-# CloudWatch Monitoring
-#===============================================================================
+  cluster_security_group_ids = [module.security_groups.eks_cluster_security_group_id]
+
+  tags = local.common_tags
+}
 
 module "monitoring" {
+  count = var.enable_monitoring ? 1 : 0
+
   source = "./modules/monitoring"
-  
-  name        = local.name
-  environment = var.environment
-  
-  # EKS cluster info for monitoring
-  cluster_name = module.eks.cluster_name
-  
-  # RDS instance info for monitoring
-  db_instance_identifier = module.rds.db_instance_identifier
-  
-  # Redis cluster info for monitoring
-  redis_cluster_id = module.redis.redis_cluster_id
-  
-  tags = local.tags
-}
 
-#===============================================================================
-# Route53 DNS (Optional)
-#===============================================================================
+  project_name = var.project_name
+  environment  = var.environment
+  aws_region   = var.aws_region
 
-module "route53" {
-  source = "./modules/route53"
-  count  = var.domain_name != "" ? 1 : 0
-  
-  domain_name = var.domain_name
-  alb_dns_name = module.alb.alb_dns_name
-  alb_zone_id  = module.alb.alb_zone_id
-  
-  tags = local.tags
+  alert_email_addresses = var.monitoring_alert_emails
+
+  # EKS monitoring
+  create_eks_log_groups = true
+  create_eks_alarms     = true
+  create_eks_widgets    = true
+  cluster_name          = module.eks.cluster_id
+
+  # RDS monitoring
+  create_rds_alarms  = true
+  create_rds_widgets = true
+  rds_instance_id    = module.rds.db_instance_id
+
+  # ElastiCache monitoring
+  create_elasticache_alarms  = true
+  create_elasticache_widgets = true
+  elasticache_cluster_id     = module.elasticache.replication_group_id
+
+  # ALB monitoring
+  create_alb_alarms  = true
+  create_alb_widgets = true
+  alb_arn_suffix     = module.alb.load_balancer_arn_suffix
+
+  # Application monitoring
+  create_application_log_metrics = true
+  create_log_insights_queries    = true
+  create_composite_alarms        = true
+
+  tags = local.common_tags
 }
