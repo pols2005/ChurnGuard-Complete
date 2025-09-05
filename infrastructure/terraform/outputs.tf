@@ -220,3 +220,41 @@ output "resource_arns" {
     }
   }
 }
+
+# Route53 DNS Outputs
+output "dns_configuration" {
+  description = "DNS configuration information"
+  value       = var.enable_dns ? module.route53[0].dns_configuration : null
+}
+
+output "hosted_zone_id" {
+  description = "Route53 hosted zone ID"
+  value       = var.enable_dns ? module.route53[0].hosted_zone_id : null
+}
+
+output "hosted_zone_name_servers" {
+  description = "Route53 hosted zone name servers"
+  value       = var.enable_dns ? module.route53[0].hosted_zone_name_servers : null
+}
+
+output "ssl_certificate_arn" {
+  description = "ACM SSL certificate ARN"
+  value       = var.enable_dns ? module.route53[0].validated_certificate_arn : null
+}
+
+output "domain_endpoints" {
+  description = "Domain endpoints for the application"
+  value = var.enable_dns && var.domain_name != null ? {
+    main_domain = var.domain_name
+    www_domain  = var.create_www_redirect ? "www.${var.domain_name}" : null
+    api_domain  = var.create_api_subdomain ? "api.${var.domain_name}" : null
+    https_main  = var.create_ssl_certificate ? "https://${var.domain_name}" : null
+    https_www   = var.create_ssl_certificate && var.create_www_redirect ? "https://www.${var.domain_name}" : null
+    https_api   = var.create_ssl_certificate && var.create_api_subdomain ? "https://api.${var.domain_name}" : null
+  } : null
+}
+
+output "dns_setup_instructions" {
+  description = "Instructions for setting up DNS"
+  value       = var.enable_dns ? module.route53[0].dns_setup_instructions : null
+}

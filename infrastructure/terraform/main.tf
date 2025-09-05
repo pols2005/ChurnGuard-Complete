@@ -158,7 +158,7 @@ module "alb" {
   internal                    = var.alb_internal
   enable_deletion_protection  = var.alb_enable_deletion_protection
   enable_https                = var.alb_enable_https
-  certificate_arn             = var.alb_certificate_arn
+  certificate_arn             = var.enable_dns && var.create_ssl_certificate ? module.route53[0].validated_certificate_arn : var.alb_certificate_arn
   ssl_policy                  = var.alb_ssl_policy
   enable_access_logs          = var.alb_enable_access_logs
   access_logs_bucket          = var.alb_enable_access_logs ? module.s3.logs_bucket_id : null
@@ -248,6 +248,43 @@ module "monitoring" {
   create_application_log_metrics = true
   create_log_insights_queries    = true
   create_composite_alarms        = true
+
+  tags = local.common_tags
+}
+
+module "route53" {
+  count = var.enable_dns ? 1 : 0
+
+  source = "./modules/route53"
+
+  project_name = var.project_name
+  environment  = var.environment
+  aws_region   = var.aws_region
+
+  # DNS Configuration
+  domain_name                 = var.domain_name
+  create_hosted_zone         = var.create_hosted_zone
+  create_ssl_certificate     = var.create_ssl_certificate
+  subject_alternative_names  = var.ssl_subject_alternative_names
+
+  # ALB Integration
+  alb_dns_name = module.alb.load_balancer_dns_name
+  alb_zone_id  = module.alb.load_balancer_zone_id
+
+  # DNS Records
+  create_www_redirect   = var.create_www_redirect
+  create_api_subdomain  = var.create_api_subdomain
+  enable_ipv6          = var.enable_ipv6
+
+  # Health Checks
+  create_health_check                     = var.create_health_check
+  health_check_path                      = var.health_check_path
+  health_check_failure_threshold         = var.health_check_failure_threshold
+  health_check_request_interval          = var.health_check_request_interval
+  health_check_measure_latency           = var.health_check_measure_latency
+  health_check_alarm_datapoints          = var.health_check_alarm_datapoints
+  health_check_alarm_evaluation_periods  = var.health_check_alarm_evaluation_periods
+  health_check_alarm_actions             = var.enable_monitoring ? [module.monitoring[0].sns_topic_arn] : []
 
   tags = local.common_tags
 }

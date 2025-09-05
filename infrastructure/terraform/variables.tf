@@ -382,6 +382,102 @@ variable "monitoring_alert_emails" {
   default     = []
 }
 
+# Route53 DNS Configuration
+variable "enable_dns" {
+  description = "Enable DNS management with Route53"
+  type        = bool
+  default     = false
+}
+
+variable "domain_name" {
+  description = "Primary domain name for the application"
+  type        = string
+  default     = null
+}
+
+variable "create_hosted_zone" {
+  description = "Create Route53 hosted zone"
+  type        = bool
+  default     = false
+}
+
+variable "create_ssl_certificate" {
+  description = "Create ACM SSL certificate"
+  type        = bool
+  default     = false
+}
+
+variable "ssl_subject_alternative_names" {
+  description = "Additional domain names for the SSL certificate"
+  type        = list(string)
+  default     = []
+}
+
+variable "create_www_redirect" {
+  description = "Create www subdomain pointing to main domain"
+  type        = bool
+  default     = true
+}
+
+variable "create_api_subdomain" {
+  description = "Create api subdomain pointing to load balancer"
+  type        = bool
+  default     = true
+}
+
+variable "enable_ipv6" {
+  description = "Enable IPv6 AAAA records"
+  type        = bool
+  default     = false
+}
+
+variable "create_health_check" {
+  description = "Create Route53 health check"
+  type        = bool
+  default     = false
+}
+
+variable "health_check_path" {
+  description = "Path for health check"
+  type        = string
+  default     = "/health"
+}
+
+variable "health_check_failure_threshold" {
+  description = "Number of consecutive health check failures before considering unhealthy"
+  type        = number
+  default     = 3
+}
+
+variable "health_check_request_interval" {
+  description = "Interval between health checks (30 or 10 seconds)"
+  type        = number
+  default     = 30
+  
+  validation {
+    condition     = contains([10, 30], var.health_check_request_interval)
+    error_message = "Health check request interval must be either 10 or 30 seconds."
+  }
+}
+
+variable "health_check_measure_latency" {
+  description = "Enable latency measurement for health checks"
+  type        = bool
+  default     = false
+}
+
+variable "health_check_alarm_datapoints" {
+  description = "Number of datapoints that must be breaching to trigger alarm"
+  type        = number
+  default     = 2
+}
+
+variable "health_check_alarm_evaluation_periods" {
+  description = "Number of periods to evaluate for the alarm"
+  type        = number
+  default     = 2
+}
+
 # Additional Tags
 variable "additional_tags" {
   description = "Additional tags to apply to all resources"
